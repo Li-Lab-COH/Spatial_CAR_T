@@ -30,31 +30,36 @@ from shapely.geometry import Polygon, Point
 from scipy import sparse
 from tensorflow.keras import backend as K
 import gc
+import sys
+
+"""
+TODOs:
+
+- [] Set up a config file parser for the model parameters, outputs
+- [] Save the ID ranges for each sample and then sub samples
+- [] Remove "DIFF" comments if everything works out - These are sections that do something slightly different
+        Than the original code, but seems to do the same thing
+- [] Why y,x format?
+
+"""
+
 
 # ---------------------------------
 # Configuration
 # ---------------------------------
 SAMPLES = [
-    #"BANOSSM_SSM0015_1_PR_Whole_C1_VISHD_F07833_22WJCYLT3",
-    #"BANOSSM_SSM0015_1_PR_Whole_C1_VISHD_F07834_22WJCYLT3",
-    "BANOSSM_SSM0015_1_PR_Whole_C1_VISHD_F07835_22WJCYLT3_swapped",
-    "BANOSSM_SSM0015_1_PR_Whole_C1_VISHD_F07836_22WJCYLT3_swapped",
-    #"BANOSSM_SSM0015_1_PR_Whole_C1_VISHD_F07837_22WJCYLT3",
-    # "BANOSSM_SSM0015_1_PR_Whole_C1_VISHD_F07838_22WJCYLT3",
+    'BANOSSM_SSM0015_1_PR_Whole_C1_VISHD_F07839_22WJCYLT3',
+    'BANOSSM_SSM0015_1_PR_Whole_C1_VISHD_F07840_22WJCYLT3'
 ]
 
 HNE_TIF_PATHS = {
-    "F07833": Path("/mnt/c/Users/jonan/Documents/1Work/RoseLab/Spatial/dietary_droject/data/images_for_alignments/111324-111424_Training_TMA2/hne/MycCAP_TMA2_Slide2.tif"),
-    "F07834": Path("/mnt/c/Users/jonan/Documents/1Work/RoseLab/Spatial/dietary_droject/data/images_for_alignments/111324-111424_Training_TMA2/hne/MycCAP_TMA2_Slide1.tif"),
-    "F07835": Path("/mnt/c/Users/jonan/Documents/1Work/RoseLab/Spatial/dietary_droject/data/images_for_alignments/120524-120624_MycCap_TMA1_1_TMA3_1/hne/MycCap_TMA1_slide1.tif"),
-    "F07836": Path("/mnt/c/Users/jonan/Documents/1Work/RoseLab/Spatial/dietary_droject/data/images_for_alignments/120524-120624_MycCap_TMA1_1_TMA3_1/hne/RL_MycCap_TMA3_slide1.tif"),
-    "F07837": Path("/mnt/c/Users/jonan/Documents/1Work/RoseLab/Spatial/dietary_droject/data/images_for_alignments/121124-121224_SKO_TMA1_1_n_TMA2_1/hne/12_11_2024_RL_SKOTMA1_Slide_1.tif"),
-    "F07838": Path("/mnt/c/Users/jonan/Documents/1Work/RoseLab/Spatial/dietary_droject/data/images_for_alignments/121124-121224_SKO_TMA1_1_n_TMA2_1/hne/12_11_2024_RL_SKOTMA2 Slide_1.tif"),
+    "F07839": Path("/mnt/c/Users/jonan/Documents/1Work/RoseLab/Spatial/dietary_droject/data/images_for_alignments/121724-121924_RL_mRT_TMA4_1_TMA5_1/hne/121724_RL_mRT_TMA4_Slide_1.tif"),
+    "F07840": Path("/mnt/c/Users/jonan/Documents/1Work/RoseLab/Spatial/dietary_droject/data/images_for_alignments/121724-121924_RL_mRT_TMA4_1_TMA5_1/hne/121724_RL_mRT_TMA5_Slide_1.tif")
 }
 
 
-BASE_DIR = Path("/mnt/c/Users/jonan/Documents/1Work/RoseLab/Spatial/dietary_droject/data/Rose_Li_VisiumHD")
-SEGMENTATION_PATH = Path("/mnt/c/Users/jonan/Documents/1Work/RoseLab/Spatial/dietary_droject/data/cell_segmentation")
+BASE_DIR = Path("/mnt/c/Users/jonan/Documents/1Work/RoseLab/Spatial/CAR_T/data/Raw")
+SEGMENTATION_PATH = Path("/mnt/c/Users/jonan/Documents/1Work/RoseLab/Spatial/CAR_T/data/cell_segmentation")
 
 # StarDist parameters
 MIN_PERCENTILE = 5
@@ -63,9 +68,14 @@ MODEL_SCALE = 2
 NMS_THRESHOLD = 0.1
 PROB_THRESHOLD = 0.33
 N_TILES = (80,80,1)
+# StarDist “big” segmentation params (tunable to fit your GPU)
+BLOCK_SIZE = 4096         # pixel width/height of each tile
+MIN_OVERLAP_BIG = 128     # how much each tile overlaps its neighbor
+CONTEXT = 64              # extra border to avoid edge artifacts
+
 
 # QC thresholds
-AREA_CUTOFF = 60
+AREA_CUTOFF = 100
 UMI_CUTOFF = 50
 UMI_SPATIAL_CUTOFF = 50
 
@@ -74,10 +84,10 @@ LOG_FILE = SEGMENTATION_PATH / "pipeline.log"
 SEGMENTATION_PATH.mkdir(parents=True, exist_ok=True)
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s %(levelname)s: %(message)s",
-    handlers=[
-        logging.FileHandler(LOG_FILE),
-        logging.StreamHandler()
+    format="%(asctime)s %(levelname)s [%(name)s]: %(message)s", #The colon appearsafter all the previous info
+    handlers=[ #Loggers generate messages. Handlers decide what to do with them.
+        logging.FileHandler(LOG_FILE), # Sends log message to the log file
+        logging.StreamHandler() # Sends to a stream, usually sys.stderr
     ]
 )
 
@@ -93,38 +103,54 @@ def load_spatial_data(sample: str):
     adata = sc.read_10x_h5(str(h5_file))
     adata.var_names_make_unique()
 
-    df_pos = pd.read_parquet(str(pq_file)).set_index("barcode")
-    df_pos["index"] = df_pos.index
+    logging.info(f'Loading parquet file for {sample}')
+    df_pos = pd.read_parquet(str(pq_file)).set_index("barcode") #DIFF - .set_index is on another line df_tissue_positions['index']=df_tissue_positions.index
+    df_pos["index"] = df_pos.index # To check joins
     adata.obs =  pd.merge(adata.obs, df_pos, left_index=True, right_index=True)
 
-
-    geometries = [Point(xy) for xy in zip(df_pos["pxl_col_in_fullres"],
+    # Creates a geomotries object that contains tuples of the coordiates - used later
+    geometries = [Point(xy) for xy in zip(df_pos["pxl_col_in_fullres"], # DIFF - geomtry instead of geometries
                                           df_pos["pxl_row_in_fullres"])]
     gdf_coords = gpd.GeoDataFrame(df_pos, geometry=geometries)
+    logging.info(f'Data loaded {sample}')
     return adata, gdf_coords
 #CHECKED
 
 def segment_nuclei(sample: str):
     # Load full-resolution RGB H&E image from dictionary
     sample_id = re.search(r'F\d{5}', sample).group(0)
+    logging.info(f'Starting segmentation {sample_id}')
     img_path = HNE_TIF_PATHS[sample_id]
+    
+    if not img_path.exists():
+        logging.critical(f"Image file not found for sample {sample_id}: {img_path}")
+        sys.exit(1)
+    
+    
+    
     logging.info(f"Loading full-res image {img_path}")
     img_np = tifffile.imread(str(img_path))  # full-res TIFF loaded as (H, W, 3)
 
     # Normalize intensities
     img_norm = normalize(img_np, MIN_PERCENTILE, MAX_PERCENTILE, axis=(0,1,2))
 
-    # Run StarDist segmentation
+    # Load model once
     model = StarDist2D.from_pretrained("2D_versatile_he")
-    logging.info("Running StarDist segmentation on full-res image")
-    labels, polys = model.predict_instances(
-        img_norm,
-        scale=MODEL_SCALE,
-        n_tiles=N_TILES,
-        nms_thresh=NMS_THRESHOLD,
-        prob_thresh=PROB_THRESHOLD,
-        show_tile_progress=True
+
+    logging.info(
+        f"Running StarDist.predict_instances_big with block_size={BLOCK_SIZE}, "
+        f"min_overlap={MIN_OVERLAP_BIG}, context={CONTEXT}"
     )
+    labels, polys = model.predict_instances_big(
+        img_norm,
+        axes='YXC',
+        block_size=BLOCK_SIZE,
+        min_overlap=MIN_OVERLAP_BIG,
+        context=CONTEXT,
+        prob_thresh=PROB_THRESHOLD,
+        nms_thresh=NMS_THRESHOLD
+    )
+    logging.info("Stardist (big) segmentation complete")
 
     # Clear TensorFlow session to free memory
     K.clear_session()
@@ -133,44 +159,129 @@ def segment_nuclei(sample: str):
     return img_np, labels, polys
 
 
-def make_geodataframe(polys: dict, offset_id: int = 0):
+def make_geodataframe(polys: dict, sample_id: str, offset_id: int = 0):
+    logging.info('Starting make_geodataframe from model output')
     geometries = []
-    for i in range(len(polys["coord"])):
-        ys, xs = polys["coord"][i]
-        coords = [(y, x) for x, y in zip(xs, ys)]
+    for nuclei in range(len(polys['coord'])):
+        ## DIFF this was the original, but it's actually not that different from the vignette
+        # ys, xs = polys["coord"][i] It's possible that not specifying [0] or [1] could have messed things up?
+        # coords = [(y, x) for x, y in zip(xs, ys)]
+        
+        
+        # Extracting coordinates for the current nuclei and converting them to (y, x) format
+        # Pixels work in y,x while everything else works in x,y (Cartesian (geometry))
+        coords = [(y, x) for x, y in zip(polys['coord'][nuclei][0], polys['coord'][nuclei][1])]
+        # Creating a Polygon geometry from the coordinates
         geometries.append(Polygon(coords))
+        
     gdf = gpd.GeoDataFrame(geometry=geometries)
     gdf["id"] = [f"ID_{offset_id + i + 1}" for i in range(len(gdf))]
     gdf["area"] = gdf.geometry.area
     next_offset = offset_id + len(gdf)
+
+    # Save ID range to a txt file
+    id_range_path = SEGMENTATION_PATH / f"{sample_id}_offset.txt"
+    with open(id_range_path, "w") as f:
+        f.write(f"{sample_id}: ID_{offset_id + 1} to ID_{next_offset}\n")
+
+    logging.info('Created geodataframe')
     return gdf, next_offset
 
-def bin_and_sum(adata, gdf_coords, gdf):
+def bin_and_sum(adata, gdf_coords, gdf, sample_id: str):
+    # adata - gene expression data associated to a barcode which is a bin
+    # gdf_coords - from the parquet file, associates pixels to barcodes
+    # gdf - polygon gdf from model
     logging.info('Performing spatial join and summation')
+    
+    # Identify which coordinates from the parquet file are in a cell nucleus from the model output
+    # It adds a column "index_right" to gdf_coords (renamed to join), which refers to the matching row in gdf
     join = gpd.sjoin(gdf_coords, gdf, how="left", predicate="within")
+
+    # Removes barcodes that are not within a nucleus
     join["is_within_polygon"] = ~join["index_right"].isna()
-    overlaps = pd.unique(join[join.duplicated(subset=["index"])].index)
+    
+    # overlaps = pd.unique(join[join.duplicated(subset=["index"])].index) - original
+    overlaps = pd.unique(join[join.duplicated(subset=["index"])]['index'])
     join["is_not_overlap"] = ~join["index"].isin(overlaps)
 
-    good = join[join.is_within_polygon & join.is_not_overlap]
-    mask = adata.obs_names.isin(good["index"])
-    filtered = adata[mask, :].copy()
-    filtered.obs = filtered.obs.join(good.set_index("index")[['geometry', 'id']], how='left')
+    # Removing polygons that overlap - True within a polyn, true that not in overlap
+    # good = join[join.is_within_polygon & join.is_not_overlap]
+    good = join[join['is_within_polygon'] & 
+                join['is_not_overlap']
+    ]
 
-    # Summation
-    groups = filtered.obs.groupby("id", observed=True).indices
-    N = len(groups)
-    G = filtered.X.shape[1]
-    mat = sparse.lil_matrix((N, G))
-    ids = []
-    for i,(poly, idxs) in enumerate(groups.items()):
-        mat[i] = filtered.X[idxs].sum(0)
-        ids.append(poly)
-    mat = mat.tocsr()
-    gf_adata = anndata.AnnData(X=mat,
-                               obs=pd.DataFrame(ids, columns=["id"], index=ids),
-                               var=filtered.var)
+
+    # identify barcodes in adata that are in nuclei, non-overlapping, polygons
+    mask = adata.obs_names.isin(good["index"])
+    
+    # filtered = adata[mask, :].copy() - original
+    filtered = adata[mask, :]
+
+    # Save barcode -> nucleus ID mapping
+    barcode_nucleus_mapping = good[['index', 'id']].copy()
+    barcode_nucleus_mapping.to_csv(SEGMENTATION_PATH / f"{sample_id}_barcode_to_nucleus_mapping.csv", index=False)
+    
+    
+    # filtered.obs = filtered.obs.join(good.set_index("index")[['geometry', 'id']], how='left')
+    filtered.obs = pd.merge(
+        filtered.obs,
+        good[['index','geometry','id','is_within_polygon','is_not_overlap']],
+        left_index=True, right_index=True
+    )
+    logging.info('Saved barcode and id mapping' )
+    
+    #==============================================================================================#
+    # summation
+    #==============================================================================================#
+    logging.info(f'Total barcodes before filtering: {adata.n_obs}')
+    logging.info(f'Barcodes retained after spatial join and filtering: {filtered.n_obs}')
+    
+    
+    groupby_object = filtered.obs.groupby(["id"], observed=True)
+
+    # Extract the gene expression counts
+    counts = filtered.X
+
+    # Obtain the number of unique nuclei and the number of genes in the expression data
+    N_groups = groupby_object.ngroups
+    logging.info(f'Number of unique nuclei with barcodes assigned: {N_groups}')
+    N_genes = counts.shape[1]
+    logging.info(f'Number of genes: {N_genes}')
+
+    # Initialize a sparse matrix to store the summed gene counts for each nucleus
+    summed_counts = sparse.lil_matrix((N_groups, N_genes))
+    
+    # Lists to store the IDs of polygons and the current row index
+    polygon_id = []
+    row = 0
+
+    # Iterate over each unique polygon to calculate the sum of gene counts.
+    for polygons, idx_ in groupby_object.indices.items():
+        summed_counts[row] = counts[idx_].sum(0)
+        row += 1
+        polygon_id.append(polygons)
+        
+
+    # Create and AnnData object from the summed count matrix
+    summed_counts = summed_counts.tocsr()
+    gf_adata = anndata.AnnData(
+        X=summed_counts,
+        obs=pd.DataFrame(polygon_id, columns=['id'], index=polygon_id),
+        var=filtered.var
+    )
     sc.pp.calculate_qc_metrics(gf_adata, inplace=True)
+    # N = len(groups)
+    # G = filtered.X.shape[1]
+    # mat = sparse.lil_matrix((N, G))
+    # ids = []
+    # for i,(poly, idxs) in enumerate(groups.items()):
+    #     mat[i] = filtered.X[idxs].sum(0)
+    #     ids.append(poly)
+    # mat = mat.tocsr()
+    # gf_adata = anndata.AnnData(X=mat,
+    #                            obs=pd.DataFrame(ids, columns=["id"], index=ids),
+    #                            var=filtered.var)
+    # sc.pp.calculate_qc_metrics(gf_adata, inplace=True)
     return gf_adata
 
 def save_outputs(sample: str, img_np, labels, polys, gdf, gf_adata):
@@ -192,7 +303,10 @@ def save_outputs(sample: str, img_np, labels, polys, gdf, gf_adata):
         prob_threshold=PROB_THRESHOLD,
         min_percentile=MIN_PERCENTILE,
         max_percentile=MAX_PERCENTILE,
-        image_shape=img_np.shape
+        image_shape=img_np.shape,
+        block_size=BLOCK_SIZE,
+        min_overlap=MIN_OVERLAP_BIG,
+        context=CONTEXT
     )
     with open(mdl_out / f"{sample_id}_params.json", "w") as f:
         json.dump(params, f, indent=4)
@@ -244,14 +358,15 @@ def save_outputs(sample: str, img_np, labels, polys, gdf, gf_adata):
 
     logging.info(f"Saved all outputs for {sample_id} in {out_root}")
 
-def process_sample(sample: str, offset_id: int):
+def process_sample(sample: str, offset_id: int, sample_id: str):
+    
     adata, gdf_coords = load_spatial_data(sample)
     
     img_np, labels, polys = segment_nuclei(sample)
     
-    gdf, new_offset = make_geodataframe(polys, offset_id)
+    gdf, new_offset = make_geodataframe(polys, sample_id, offset_id)
     
-    gf_adata = bin_and_sum(adata, gdf_coords, gdf)
+    gf_adata = bin_and_sum(adata, gdf_coords, gdf, sample_id)
     
     save_outputs(sample, img_np, labels, polys, gdf, gf_adata)
     return new_offset
@@ -259,7 +374,9 @@ def process_sample(sample: str, offset_id: int):
 def main():
     offset = 0
     for s in SAMPLES:
-        offset = process_sample(s, offset)
+        s_id = re.search(r'_F\d+_', s).group(0).strip('_')
+        logging.info(f"Starting sample: {s_id}, offeset: {offset}")
+        offset = process_sample(s, offset, s_id)
 
 if __name__ == "__main__":
     main()
