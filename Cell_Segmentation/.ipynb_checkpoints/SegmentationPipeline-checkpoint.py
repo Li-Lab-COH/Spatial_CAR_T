@@ -36,11 +36,11 @@ import sys
 TODOs:
 
 - [] Set up a config file parser for the model parameters, outputs
-- [] Save the ID ranges for each sample and then sub samples
+- [x] Save the ID ranges for each sample and then sub samples
 - [] Remove "DIFF" comments if everything works out - These are sections that do something slightly different
         Than the original code, but seems to do the same thing
 - [] Why y,x format?
-
+- [] Test out min and max percentiles as well
 """
 
 
@@ -65,13 +65,13 @@ SEGMENTATION_PATH = Path("/mnt/c/Users/jonan/Documents/1Work/RoseLab/Spatial/CAR
 MIN_PERCENTILE = 5
 MAX_PERCENTILE = 95
 MODEL_SCALE = 2
-NMS_THRESHOLD = 0.1
-PROB_THRESHOLD = 0.33
-N_TILES = (80,80,1)
-# StarDist “big” segmentation params (tunable to fit your GPU)
-BLOCK_SIZE = 4096         # pixel width/height of each tile
-MIN_OVERLAP_BIG = 128     # how much each tile overlaps its neighbor
-CONTEXT = 64              # extra border to avoid edge artifacts
+NMS_THRESHOLD = 0.10
+PROB_THRESHOLD = 0.15
+# N_TILES = (80,80,1)
+# StarDist “big” segmentation params (tunable to fit GPU)
+BLOCK_SIZE = 2024 #4096         # pixel width/height of each tile
+MIN_OVERLAP_BIG = 256     # how much each tile overlaps its neighbor
+CONTEXT = 94             # extra border to avoid edge artifacts
 
 
 # QC thresholds
