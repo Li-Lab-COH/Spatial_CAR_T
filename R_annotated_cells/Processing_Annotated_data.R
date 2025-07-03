@@ -4,33 +4,19 @@ library(SeuratDisk)
 library(Seurat)
 library(SeuratDisk)
 
-# 1. Read your object
+# Read your object
 seurat_obj <- readRDS("~/1Work/RoseLab/Spatial/CAR_T/data/annotated.all.cells_PricemanLab.RDS")
 
-# 2. Keep only the RNA assay
-DefaultAssay(seurat_obj) <- "RNA"
-seurat_obj@assays <- seurat_obj@assays["RNA"]  # drop everything but RNA
+colnames(seurat_obj@meta.data)
 
-# 3. Drop ALL dimensionality reductions
-#    (assign an empty list, not NULL)
-seurat_obj@reductions <- list()
+unique(seurat_obj@meta.data$sctype_classification)
 
-# 4. Optionally trim out unwanted assay slots (e.g. scale.data) to save space
-seurat_obj@assays$RNA@scale.data <- NULL
+# or equivalently
+unique(Idents(seurat_obj))
 
-# 5. Save & convert, allowing overwrite
-out_h5seurat <- "~/1Work/RoseLab/Spatial/CAR_T/data/carT_reference_pruned.h5Seurat"
-out_h5ad      <- "~/1Work/RoseLab/Spatial/CAR_T/data/carT_reference_pruned.h5ad"
-
-SaveH5Seurat(
+DimPlot(
   seurat_obj,
-  filename  = out_h5seurat,
-  overwrite = TRUE
-)
-
-Convert(
-  out_h5seurat,
-  dest      = "h5ad",
-  filename  = out_h5ad,
-  overwrite = TRUE
+  group.by = "sctype_classification",
+  label = TRUE,          # adds text labels at cluster centroids
+  repel = TRUE           # prevents label overlap
 )
