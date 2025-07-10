@@ -27,3 +27,9 @@ DimPlot(
   label = TRUE,          # adds text labels at cluster centroids
   repel = TRUE           # prevents label overlap
 )
+
+
+###########
+# Clear all variables
+
+rm(list= ls())
