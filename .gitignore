@@ -1,0 +1,6 @@
+.virtual_documents/
+.virtual_documents/
+**/.ipynb_checkpoints/
+__pycache__/
+**/pypath_log/
+*.log

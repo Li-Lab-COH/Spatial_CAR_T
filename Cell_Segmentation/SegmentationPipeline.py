@@ -292,7 +292,7 @@ def save_outputs(sample: str, img_np, labels, polys, gdf, gf_adata):
     for d in [out_root, mdl_out, fig_out]:
         ensure_dir(d)
 
-    # 1) Model outputs
+    # Model outputs
     tifffile.imwrite(mdl_out / f"{sample_id}_labels.tif", labels.astype("uint16"))
     with open(mdl_out / f"{sample_id}_polys.pkl", "wb") as f:
         pickle.dump(polys, f)
@@ -311,7 +311,7 @@ def save_outputs(sample: str, img_np, labels, polys, gdf, gf_adata):
     with open(mdl_out / f"{sample_id}_params.json", "w") as f:
         json.dump(params, f, indent=4)
 
-    # 2) Save H&E and overlay
+    # Save H&E and overlay
     Image.fromarray(img_np).save(fig_out / f"{sample_id}_hne_image.png")
     plt.figure(figsize=(15,15))
     plt.imshow(img_np)
@@ -321,13 +321,13 @@ def save_outputs(sample: str, img_np, labels, polys, gdf, gf_adata):
     plt.savefig(fig_out / f"{sample_id}_overlay.png", dpi=1200, bbox_inches="tight", pad_inches=0)
     plt.close()
 
-    # 3) Save gdf
+    # Save gdf
     gdf.to_file(out_root / f"{sample_id}_gdf.gpkg", driver="GPKG")
 
-    # 4) Save AnnData
+    # Save AnnData
     gf_adata.write(out_root / f"{sample_id}_grouped_filtered_adata.h5ad")
 
-    # 5) QC plots: area distribution
+    # QC plots: area distribution
     fig, axs = plt.subplots(1,2,figsize=(15,4))
     axs[0].hist(gdf.area, bins=50, edgecolor="black")
     axs[0].set_title("Nuclei Area")
@@ -345,7 +345,7 @@ def save_outputs(sample: str, img_np, labels, polys, gdf, gf_adata):
     fig.savefig(fig_out / f"{sample_id}_umi_distribution.png", dpi=300, bbox_inches="tight")
     plt.close(fig)
 
-    # 7) Spatial UMI maps
+    # Spatial UMI maps
     gdf_umi = gdf.merge(gf_adata.obs[["total_counts"]], left_on="id", right_index=True)
     for cutoff, suffix in [(None, "all"), (UMI_SPATIAL_CUTOFF, f">_{UMI_SPATIAL_CUTOFF}")]:
         df = gdf_umi if cutoff is None else gdf_umi[gdf_umi["total_counts"]>cutoff]
