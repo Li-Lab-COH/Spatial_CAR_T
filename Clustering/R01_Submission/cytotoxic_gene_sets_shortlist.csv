@@ -1,0 +1,6 @@
+set_name,collection,n_genes,has_pmid,pmids,has_url,urls,source_file,description
+HALLMARK_ALLOGRAFT_REJECTION,MH:Hallmark,192,False,[],True,['https://www.gsea-msigdb.org/gsea/msigdb/mouse/geneset/HALLMARK_ALLOGRAFT_REJECTION'],mh.all.v2025.1.Mm.symbols.gmt,https://www.gsea-msigdb.org/gsea/msigdb/mouse/geneset/HALLMARK_ALLOGRAFT_REJECTION
+HALLMARK_APOPTOSIS,MH:Hallmark,161,False,[],True,['https://www.gsea-msigdb.org/gsea/msigdb/mouse/geneset/HALLMARK_APOPTOSIS'],mh.all.v2025.1.Mm.symbols.gmt,https://www.gsea-msigdb.org/gsea/msigdb/mouse/geneset/HALLMARK_APOPTOSIS
+HALLMARK_COMPLEMENT,MH:Hallmark,185,False,[],True,['https://www.gsea-msigdb.org/gsea/msigdb/mouse/geneset/HALLMARK_COMPLEMENT'],mh.all.v2025.1.Mm.symbols.gmt,https://www.gsea-msigdb.org/gsea/msigdb/mouse/geneset/HALLMARK_COMPLEMENT
+HALLMARK_INTERFERON_GAMMA_RESPONSE,MH:Hallmark,188,False,[],True,['https://www.gsea-msigdb.org/gsea/msigdb/mouse/geneset/HALLMARK_INTERFERON_GAMMA_RESPONSE'],mh.all.v2025.1.Mm.symbols.gmt,https://www.gsea-msigdb.org/gsea/msigdb/mouse/geneset/HALLMARK_INTERFERON_GAMMA_RESPONSE
+HALLMARK_PI3K_AKT_MTOR_SIGNALING,MH:Hallmark,105,False,[],True,['https://www.gsea-msigdb.org/gsea/msigdb/mouse/geneset/HALLMARK_PI3K_AKT_MTOR_SIGNALING'],mh.all.v2025.1.Mm.symbols.gmt,https://www.gsea-msigdb.org/gsea/msigdb/mouse/geneset/HALLMARK_PI3K_AKT_MTOR_SIGNALING
