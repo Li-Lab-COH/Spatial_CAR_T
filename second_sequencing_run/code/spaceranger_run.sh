@@ -10,12 +10,12 @@
 # Human or mouse run?
 species="mouse" #mouse, human
 
-if [[$species -eq "mouse"]]; then
+if [[ $species -eq "mouse" ]]; then
     TRANSCRIPTOME="/path/to/refdata"  # Reference transcriptome for mouse samples
     PROBE_SET="/path/to/human_v2_probeset.csv"  # Probe set for FFPE
     job_manifest="/path/to/csv"
     OUTPUT_DIR="/path/to/output_directory"  # Directory where outputs will be saved
-elif [[$species -eq "human"]]; then
+elif [[ $species -eq "human" ]]; then
     TRANSCRIPTOME="/path/to/refdata"  # Reference transcriptome for mouse samples
     PROBE_SET="/path/to/human_v2_probeset.csv"  # Probe set for FFPE
     job_manifest="/path/to/csv"
