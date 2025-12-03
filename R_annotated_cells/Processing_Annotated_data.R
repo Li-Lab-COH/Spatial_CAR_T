@@ -4,7 +4,8 @@ library(SeuratDisk)
 
 
 # Read your object
-base_dir <- "~/1Work/RoseLab/Spatial/CAR_T/data/sc-reference"
+# base_dir <- "~/1Work/RoseLab/Spatial/CAR_T/data/sc-reference"
+base_dir
 rds_file <- file.path(base_dir, "annotated.all.cells_PricemanLab.RDS")
 
 seurat_obj <- readRDS(rds_file)
