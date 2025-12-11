@@ -96,3 +96,48 @@ Reductions(seurat_obj)
 # Clear all variables
 
 rm(list= ls())
+
+
+########## Sanity Checks ##############
+
+cell_barcodes <- c(
+  "56955_TGCAGATGTGAGCAGT-1",
+  "56971_GTATTTCGTCGTCAGC-1",
+  "56971_ACTGTGATCTACCACC-1"
+)
+
+library(Matrix)
+
+counts <- LayerData(seurat_obj, layer = "counts")
+n_top <- 10
+
+# Ensure barcodes exist
+valid_barcodes <- cell_barcodes[cell_barcodes %in% colnames(counts)]
+if (length(valid_barcodes) != length(cell_barcodes)) {
+  warning("Some barcodes not found in the object:\n",
+          paste(setdiff(cell_barcodes, valid_barcodes), collapse = ", "))
+}
+
+for (cell_name in valid_barcodes) {
+  
+  vec <- counts[, cell_name]          # sparse column for this barcode
+  vec_dense <- as.numeric(vec)        # convert to numeric vector
+  
+  # order descending
+  ord <- order(vec_dense, decreasing = TRUE)
+  top_idx <- ord[1:n_top]
+  
+  top_genes <- rownames(counts)[top_idx]
+  top_vals  <- vec_dense[top_idx]
+  
+  cat("\n=== Cell:", cell_name, "===\n")
+  
+  cat("Annotations:\n")
+  print(seurat_obj@meta.data[cell_name, , drop = FALSE])
+  
+  cat("\nTop genes:\n")
+  print(data.frame(gene = top_genes, count = top_vals))
+}
+
+
+
