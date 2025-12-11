@@ -5,8 +5,8 @@ library(SeuratDisk)
 
 # Read your object
 # base_dir <- "~/1Work/RoseLab/Spatial/CAR_T/data/sc-reference"
-base_dir
-rds_file <- file.path(base_dir, "annotated.all.cells_PricemanLab.RDS")
+base_dir <- "~/Roselab/Spatial/CAR_T/data/sc-reference/"
+rds_file <- file.path(base_dir, "annotated.all.cells.RDS")
 
 seurat_obj <- readRDS(rds_file)
 
@@ -28,7 +28,9 @@ write.table(data.frame(rownames(counts)), file = features_file,
 
 write.table(data.frame(colnames(counts)), file = barcodes_file,
             row.names = FALSE, col.names = FALSE, sep = "\t", quote = FALSE)
-
+            
+# saving metadata
+write.csv(seurat_obj@meta.data, file.path(base_dir, "metadata.csv"))
 ### ---------------------- Embedding and annotations ---------------------------
 
 cell_type_file <- file.path(base_dir, "cell_type.csv")
