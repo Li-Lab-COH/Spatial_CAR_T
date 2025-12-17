@@ -1,0 +1,74 @@
+
+---------------------------- /cm/shared/modulefiles ----------------------------
+   cuda10.1/blas/10.1.243        cuda11.4/fft/11.4.2
+   cuda10.1/fft/10.1.243         cuda11.4/toolkit/11.4.2
+   cuda10.1/nsight/10.1.243      cuda12.3/blas/12.3.2
+   cuda10.1/profiler/10.1.243    cuda12.3/fft/12.3.2
+   cuda10.1/toolkit/10.1.243     cuda12.3/toolkit/12.3.2 (L)
+   cuda11.4/blas/11.4.2
+
+------------------------------ /packages/modules -------------------------------
+   Dorado/0.3.0-cuda-Container
+
+---------------------------- /packages/modulefiles -----------------------------
+   cuda/11.8       gromacs/2019.beta-cuda10-gcc-8.2.0
+   f5c/1.1-cuda    gromacs/2019.3-cuda10-gcc-8.2.0    (D)
+
+----------------------- /packages/easybuild/modules/all ------------------------
+   CUDA/8.0.61_375.26-GCC-5.4.0-2.26
+   CUDA/8.0.61
+   CUDA/9.0.176-GCC-6.4.0-2.28
+   CUDA/9.1.85-GCC-6.4.0-2.28
+   CUDA/9.2.88-GCC-7.3.0-2.30                   (D)
+   Mako/1.0.7-fosscuda-2018a-Python-2.7.14
+   NCCL/2.4.8-gcccuda-2019b
+   OpenMPI/2.1.1-gcccuda-2017b
+   OpenMPI/2.1.2-gcccuda-2018a
+   OpenMPI/3.1.1-gcccuda-2018b                  (D)
+   Python/2.7.14-fosscuda-2018a
+   Python/3.6.4-fosscuda-2018a
+   TensorFlow/1.8.0-fosscuda-2018a-Python-3.6.4
+   cuDNN/7.0.5.15-fosscuda-2018a
+   fosscuda/2017b
+   fosscuda/2018a
+   fosscuda/2018b                               (D)
+   gcccuda/2017b
+   gcccuda/2018a
+   gcccuda/2018b                                (D)
+   wheel/0.31.0-fosscuda-2018a-Python-3.6.4
+
+  Where:
+   D:  Default Module
+   L:  Module is loaded
+
+Module defaults are chosen based on Find First Rules due to Name/Version/Version modules found in the module tree.
+See https://lmod.readthedocs.io/en/latest/060_locating.html for details.
+
+Use "module spider" to find all possible modules and extensions.
+Use "module keyword key1 key2 ..." to search for all possible modules matching
+any of the "keys".
+
+
+/home/janzules/mamba_envs/spatial_gpu_env/lib/python3.10/site-packages/lightning/fabric/__init__.py:40: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+/home/janzules/mamba_envs/spatial_gpu_env/lib/python3.10/site-packages/dask/dataframe/__init__.py:31: FutureWarning: The legacy Dask DataFrame implementation is deprecated and will be removed in a future version. Set the configuration option `dataframe.query-planning` to `True` or None to enable the new Dask Dataframe implementation and silence this warning.
+  warnings.warn(
+/home/janzules/mamba_envs/spatial_gpu_env/lib/python3.10/site-packages/anndata/utils.py:434: FutureWarning: Importing read_text from `anndata` is deprecated. Import anndata.io.read_text instead.
+  warnings.warn(msg, FutureWarning)
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+You are using a CUDA device ('NVIDIA A100-PCIE-40GB') that has Tensor Cores. To properly utilize them, you should set `torch.set_float32_matmul_precision('medium' | 'high')` which will trade-off precision for performance. For more details, read https://pytorch.org/docs/stable/generated/torch.set_float32_matmul_precision.html#torch.set_float32_matmul_precision
+/home/janzules/mamba_envs/spatial_gpu_env/lib/python3.10/site-packages/lightning/pytorch/loops/fit_loop.py:293: The number of training batches (2) is smaller than the logging interval Trainer(log_every_n_steps=10). Set a lower value for log_every_n_steps if you want to see logs for the training epoch.
+`Trainer.fit` stopped: `max_epochs=1` reached.
+Traceback (most recent call last):
+  File "<stdin>", line 51, in <module>
+  File "/home/janzules/mamba_envs/spatial_gpu_env/lib/python3.10/site-packages/cell2location/models/_cell2location_model.py", line 73, in __init__
+    if not np.all(adata.var_names == cell_state_df.index):
+  File "/home/janzules/mamba_envs/spatial_gpu_env/lib/python3.10/site-packages/pandas/core/ops/common.py", line 76, in new_method
+    return method(self, other)
+  File "/home/janzules/mamba_envs/spatial_gpu_env/lib/python3.10/site-packages/pandas/core/arraylike.py", line 40, in __eq__
+    return self._cmp_method(other, operator.eq)
+  File "/home/janzules/mamba_envs/spatial_gpu_env/lib/python3.10/site-packages/pandas/core/indexes/base.py", line 7251, in _cmp_method
+    raise ValueError("Lengths must match to compare")
+ValueError: Lengths must match to compare
