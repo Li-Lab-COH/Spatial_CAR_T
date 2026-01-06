@@ -1,0 +1,157 @@
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/lightning/pytorch/trainer/configuration_validator.py:68: You passed in a `val_dataloader` but have no `validation_step`. Skipping val loop.
+You are using a CUDA device ('NVIDIA A100-PCIE-40GB') that has Tensor Cores. To properly utilize them, you should set `torch.set_float32_matmul_precision('medium' | 'high')` which will trade-off precision for performance. For more details, read https://pytorch.org/docs/stable/generated/torch.set_float32_matmul_precision.html#torch.set_float32_matmul_precision
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+SLURM auto-requeueing enabled. Setting signal handlers.
+/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:434: The 'train_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=7` in the `DataLoader` to improve performance.
+/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/lightning/pytorch/loops/fit_loop.py:317: The number of training batches (1) is smaller than the logging interval Trainer(log_every_n_steps=10). Set a lower value for log_every_n_steps if you want to see logs for the training epoch.
+Traceback (most recent call last):
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/pyro/poutine/trace_messenger.py", line 191, in __call__
+    ret = self.fn(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/pyro/poutine/messenger.py", line 32, in _context_wrap
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/pyro/poutine/messenger.py", line 32, in _context_wrap
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/pyro/nn/module.py", line 520, in __call__
+    result = super().__call__(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/cell2location/models/_cell2location_module.py", line 461, in forward
+    mu = ((w_sf @ self.cell_state) * m_g + (obs2sample @ s_g_gene_add)) * detection_y_s
+           ~~~~~^~~~~~~~~~~~~~~~~
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 19.31 GiB. GPU 0 has a total capacity of 39.56 GiB of which 102.69 MiB is free. Including non-PyTorch memory, this process has 39.46 GiB memory in use. Of the allocated memory 38.95 GiB is allocated by PyTorch, and 18.06 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/janzules/spatial/CAR-T/code/CellTypeAnnotation/c2l_export_only.py", line 266, in <module>
+    main()
+  File "/home/janzules/spatial/CAR-T/code/CellTypeAnnotation/c2l_export_only.py", line 175, in main
+    mod = cell2location.models.Cell2location.load(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/scvi/model/base/_base_model.py", line 917, in load
+    model.module.on_load(model, pyro_param_store=pyro_param_store)
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/scvi/module/base/_base_module.py", line 389, in on_load
+    model.train(max_steps=1, **self.on_load_kwargs)
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/cell2location/models/_cell2location_model.py", line 216, in train
+    super().train(**kwargs)
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/scvi/model/base/_pyromixin.py", line 199, in train
+    return runner()
+           ^^^^^^^^
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/scvi/train/_trainrunner.py", line 200, in __call__
+    self._run_training_core()
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/scvi/train/_trainrunner.py", line 127, in _run_training_core
+    self.trainer.fit(self.training_plan, self.data_splitter, ckpt_path=self.ckpt_path)
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/scvi/train/_trainer.py", line 220, in fit
+    super().fit(*args, **kwargs)
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/lightning/pytorch/trainer/trainer.py", line 584, in fit
+    call._call_and_handle_interrupt(
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/lightning/pytorch/trainer/call.py", line 49, in _call_and_handle_interrupt
+    return trainer_fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/lightning/pytorch/trainer/trainer.py", line 630, in _fit_impl
+    self._run(model, ckpt_path=ckpt_path, weights_only=weights_only)
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/lightning/pytorch/trainer/trainer.py", line 1079, in _run
+    results = self._run_stage()
+              ^^^^^^^^^^^^^^^^^
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/lightning/pytorch/trainer/trainer.py", line 1123, in _run_stage
+    self.fit_loop.run()
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/lightning/pytorch/loops/fit_loop.py", line 213, in run
+    self.on_run_start()
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/lightning/pytorch/loops/fit_loop.py", line 427, in on_run_start
+    call._call_callback_hooks(trainer, "on_train_start")
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/lightning/pytorch/trainer/call.py", line 228, in _call_callback_hooks
+    fn(trainer, trainer.lightning_module, *args, **kwargs)
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/scvi/model/base/_pyromixin.py", line 54, in on_train_start
+    pyro_guide(*args, **kwargs)
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/pyro/nn/module.py", line 520, in __call__
+    result = super().__call__(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/pyro/infer/autoguide/guides.py", line 510, in forward
+    self._setup_prototype(*args, **kwargs)
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/pyro/infer/autoguide/guides.py", line 460, in _setup_prototype
+    super()._setup_prototype(*args, **kwargs)
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/pyro/infer/autoguide/guides.py", line 157, in _setup_prototype
+    self.prototype_trace = poutine.block(poutine.trace(model).get_trace)(
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/pyro/poutine/messenger.py", line 32, in _context_wrap
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/pyro/poutine/trace_messenger.py", line 216, in get_trace
+    self(*args, **kwargs)
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/pyro/poutine/trace_messenger.py", line 198, in __call__
+    raise exc from e
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/pyro/poutine/trace_messenger.py", line 191, in __call__
+    ret = self.fn(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/pyro/poutine/messenger.py", line 32, in _context_wrap
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/pyro/poutine/messenger.py", line 32, in _context_wrap
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/pyro/nn/module.py", line 520, in __call__
+    result = super().__call__(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/cell2location/models/_cell2location_module.py", line 461, in forward
+    mu = ((w_sf @ self.cell_state) * m_g + (obs2sample @ s_g_gene_add)) * detection_y_s
+           ~~~~~^~~~~~~~~~~~~~~~~
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 19.31 GiB. GPU 0 has a total capacity of 39.56 GiB of which 102.69 MiB is free. Including non-PyTorch memory, this process has 39.46 GiB memory in use. Of the allocated memory 38.95 GiB is allocated by PyTorch, and 18.06 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+                Trace Shapes:                     
+                 Param Sites:                     
+                Sample Sites:                     
+                m_g_mean dist           |  1     1
+                        value           |  1     1
+         m_g_alpha_e_inv dist           |  1     1
+                        value           |  1     1
+                     m_g dist           |  1 12128
+                        value           |  1 12128
+  n_s_cells_per_location dist 427296  1 |         
+                        value 427296  1 |         
+ b_s_groups_per_location dist 427296  1 |         
+                        value 427296  1 |         
+     z_sr_groups_factors dist 427296 50 |         
+                        value 427296 50 |         
+  k_r_factors_per_groups dist           | 50     1
+                        value           | 50     1
+         x_fr_group2fact dist           | 50    12
+                        value           | 50    12
+                    w_sf dist 427296 12 |         
+                        value 427296 12 |         
+      detection_mean_y_e dist           |  4     1
+                        value           |  4     1
+           detection_y_s dist 427296  1 |         
+                        value 427296  1 |         
+  s_g_gene_add_alpha_hyp dist      1  1 |         
+                        value      1  1 |         
+       s_g_gene_add_mean dist           |  4     1
+                        value           |  4     1
+s_g_gene_add_alpha_e_inv dist           |  4     1
+                        value           |  4     1
+            s_g_gene_add dist           |  4 12128
+                        value           |  4 12128
+         alpha_g_phi_hyp dist      1  1 |         
+                        value      1  1 |         
+         alpha_g_inverse dist           |  4 12128
+                        value           |  4 12128

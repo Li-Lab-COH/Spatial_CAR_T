@@ -260,6 +260,7 @@ def main() -> None:
         train_size=1,
         lr=args.lr,
         num_particles=args.num_particles,
+	datasplitter_kwargs={"num_workers": 7},
     )
 
     # Plot ELBO history
@@ -286,7 +287,6 @@ def main() -> None:
         sample_kwargs={
             "num_samples": args.export_num_samples,
             "batch_size": args.export_batch_size,
-            "use_gpu": True,
         },
     )
 
@@ -297,7 +297,7 @@ def main() -> None:
             adata_vis,
             use_quantiles=True,
             add_to_obsm=["q50"],
-            sample_kwargs={"batch_size": args.export_batch_size, "use_gpu": True},
+            sample_kwargs={"batch_size": args.export_batch_size},
         )
 
     # QC plots

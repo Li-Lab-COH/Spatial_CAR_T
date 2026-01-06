@@ -1,14 +1,14 @@
 #!/bin/bash
-#SBATCH --job-name=c2l_map
-#SBATCH -n 1
+#SBATCH --job-name=c2l_export
+#SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
 #SBATCH -N 1-1
 #SBATCH -p gpu-a100
 #SBATCH --gres=gpu:1
 #SBATCH --mem=200G
-#SBATCH --time=10:00:00
-#SBATCH --output=./slurmOutput/c2l_map.log
-#SBATCH --error=./slurmOutput/c2l_map.err
+#SBATCH --time=24:00:00
+#SBATCH --output=./slurmOutput/c2l_export.log
+#SBATCH --error=./slurmOutput/c2l_export.err
 
 set -eo pipefail
 
@@ -24,13 +24,11 @@ python -c "import torch; print(torch.cuda.is_available()); print(torch.cuda.get_
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 export MPLBACKEND=Agg
 
-PROJ="/home/janzules/spatial/CAR-T/data/cell2location"
-SCRIPT="/home/janzules/spatial/CAR-T/code/CellTypeAnnotation/Mapping_script.py"
+# ---- export-only call (no training) ----
+python -u /home/janzules/spatial/CAR-T/code/CellTypeAnnotation/c2l_export_only.py \
+  --proj-folder /home/janzules/spatial/CAR-T/data/cell2location \
+  --run-name /home/janzules/spatial/CAR-T/data/cell2location/cell2location_map \
+  --epoch-num 450 \
+  --export-num-samples 300 \
+  --export-batch-size 4096
 
-python -u "${SCRIPT}" \
-  --proj-folder "${PROJ}" \
-  --epochs 200 \
-  --train-batch-size 16384\
-  --export-num-samples 100 \
-  --export-batch-size 2048 \
-  --export-q50
