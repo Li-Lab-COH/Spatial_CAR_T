@@ -75,6 +75,7 @@ barplot(
 # or equivalently
 unique(Idents(seurat_obj))
 
+
 DimPlot(
   seurat_obj,
   group.by = "sctype_classification",
