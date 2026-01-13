@@ -123,7 +123,8 @@ def parse_args() -> argparse.Namespace:
 
     # Which column to use as batch in Cell2location.setup_anndata
     ap.add_argument("--batch-key", type=str, default="TMA", help="obs column used as batch_key for spatial mapping.")
-
+    
+    # ap.add_argument("--file_name")
     return ap.parse_args()
 
 
@@ -328,7 +329,8 @@ def main() -> None:
         print(f"[{now_str()}] WARNING: mod.plot_spatial_QC_across_batches() failed: {e}", file=sys.stderr)
 
     # Save annotated anndata
-    out_h5ad = Path(str(run_name)) / f"sp_{args.epochs}_epochs.h5ad"
+    alpha_tag = f"{args.detection_alpha:g}" # :g = general format, removes trailing zero and decimals that are not needed
+    out_h5ad = Path(str(run_name)) / f"sp_{args.epochs}_epoch_{alpha_tag}_alpha.h5ad"
     print(f"[{now_str()}] Writing output AnnData: {out_h5ad}")
     adata_vis.write(out_h5ad)
 

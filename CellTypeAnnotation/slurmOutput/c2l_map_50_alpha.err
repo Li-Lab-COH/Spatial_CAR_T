@@ -1,0 +1,10 @@
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/lightning/pytorch/trainer/configuration_validator.py:68: You passed in a `val_dataloader` but have no `validation_step`. Skipping val loop.
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+SLURM auto-requeueing enabled. Setting signal handlers.
+`Trainer.fit` stopped: `max_epochs=200` reached.
+[2026-01-13 14:24:51] WARNING: mod.plot_QC() failed: 'post_sample_means'
+[2026-01-13 14:24:53] WARNING: mod.plot_spatial_QC_across_batches() failed: 'spatial'
+/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/anndata/_io/utils.py:243: FutureWarning: Forward slashes will be disallowed in h5 stores in the next minor release
+  return func(*args, **kwargs)
