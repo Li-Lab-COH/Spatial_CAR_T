@@ -18,6 +18,348 @@ When you save the notebook, an HTML file containing the code and output will be 
 The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
 
 ```{r}
+library(Seurat)
+
+
+# Read your object
+# base_dir <- "~/1Work/RoseLab/Spatial/CAR_T/data/sc-reference"
+base_dir <- "~/Roselab/Spatial/CAR_T/data/sc-reference/"
+rds_file <- file.path(base_dir, "annotated.all.cells.RDS")
+
+seurat_obj <- readRDS(rds_file)
+```
+
+```{r}
+# Cell 1: inspect metadata + label counts
+
+colnames(seurat_obj@meta.data)
+
+# Replace this with the correct column if needed:
+label_col <- "sctype_classification"
+
+table(seurat_obj@meta.data[[label_col]]) |> sort(decreasing = TRUE) |> head(20)
+
+# Explicit counts for the key groups:
+table(seurat_obj@meta.data[[label_col]])[c("CAR_T_cell","T_cell","B/T_cell")]
 
 ```
+
+# Percentage of cells Analysis
+```{r}
+label_col <- "sctype_classification"   # change if needed
+
+labs <- seurat_obj@meta.data[[label_col]]
+
+# counts per cell type
+ct <- table(labs, useNA = "ifany")
+
+# percent per cell type
+pct <- prop.table(ct) * 100
+
+# % CAR T cells (exact match)
+pct["CAR_T_cell"]
+
+# (optional) show all cell types sorted by %
+sort(pct, decreasing = TRUE)
+
+```
+
+```{r}
+label_col <- "sctype_classification"
+labs <- seurat_obj@meta.data[[label_col]]
+
+ct  <- table(labs, useNA = "ifany")
+pct <- prop.table(ct) * 100
+
+celltype_summary <- data.frame(
+  celltype = names(ct),
+  n        = as.integer(ct),
+  percent  = as.numeric(pct)
+)
+
+celltype_summary <- celltype_summary[order(-celltype_summary$percent), ]
+celltype_summary
+
+```
+```{r}
+library(ggplot2)
+
+df <- celltype_summary
+df$celltype <- reorder(df$celltype, df$percent)
+
+ggplot(df, aes(x = celltype, y = percent)) +
+  geom_col() +
+  coord_flip() +
+  labs(x = NULL, y = "Percent of cells", title = "Cell type composition") +
+  theme_classic(base_size = 12)
+
+```
+
+
+```{r}
+# Cell 2: check gene presence
+
+genes <- c("Ptprc","Cd3d","Cd3e","Trac","Nkg7","Klrd1","Prf1","Gzmb",
+           "Lyz2","S100a8","S100a9","Epcam","Krt8","Psca")
+
+genes_present <- genes[genes %in% rownames(seurat_obj)]
+genes_missing <- setdiff(genes, genes_present)
+
+genes_present
+genes_missing
+
+```
+
+```{r}
+# Cell: force grouping by your metadata column (robust)
+
+label_col <- "sctype_classification"
+
+genes <- c("Ptprc","Cd3d","Cd3e","Nkg7","Klrd1","Prf1","Gzmb",
+           "Lyz2","S100a8","S100a9","Epcam","Krt8","Psca")
+
+genes_present <- intersect(genes, rownames(seurat_obj))
+
+DefaultAssay(seurat_obj) <- "RNA"
+
+avg <- AverageExpression(
+  seurat_obj,
+  features = genes_present,
+  group.by = label_col,   # <-- key change
+  assays   = "RNA",
+  slot     = "data"
+)$RNA
+
+# show what groups exist
+print(dim(avg))
+print(head(colnames(avg), 30))
+
+```
+
+```{r}
+# groups x genes table like scanpy output
+avg_t <- t(as.matrix(avg))
+
+wanted <- c("CAR-T-cell","T-cell","NK-cell","Monocyte","Macrophage")
+present <- intersect(wanted, rownames(avg_t))
+present
+
+avg_t[present, , drop = FALSE]
+
+
+```
+
+```{r}
+genes2 <- c(
+  # monocyte-like
+  "Ly6c2","Ccr2","Plac8","S100a8","S100a9",
+  # macrophage-like
+  "Adgre1","C1qa","C1qb","C1qc","Apoe","Lpl","Mrc1",
+  # DC-like
+  "Itgax","Flt3","Xcr1",
+  # general myeloid
+  "Lyz2","Tyrobp"
+)
+genes2_present <- intersect(genes2, rownames(seurat_obj))
+
+avg2 <- AverageExpression(
+  seurat_obj,
+  features = genes2_present,
+  group.by = "sctype_classification",
+  assays = "RNA",
+  slot = "data"
+)$RNA
+
+avg2_t <- t(as.matrix(avg2))
+avg2_t[c("CAR-T-cell","Monocyte","Macrophage","DC"), , drop = FALSE]
+
+```
+
+
+```{r}
+
+genes <- c("Lyz2","Tyrobp","C1qa","Apoe",
+           "Itgax","Flt3","Xcr1",
+           "S100a8","S100a9",
+           "Mki67","Top2a",
+           "Isg15","Ifit1","Ifit3")
+
+genes_present <- intersect(genes, rownames(seurat_obj))
+genes_missing <- setdiff(genes, genes_present)
+
+print("Missing genes:")
+print(genes_missing)
+
+DefaultAssay(seurat_obj) <- "RNA"
+
+DotPlot(
+  seurat_obj,
+  features = genes_present,
+  group.by = "sctype_classification"
+) + RotatedAxis()
+
+```
+
+
+```{r}
+genes_extra <- c(
+  # macrophage/TAM
+  "Adgre1","Lpl","C1qc","Mrc1","Fcgr1","Msr1",
+  # cDC1
+  "Clec9a","Batf3","Irf8","Xcr1",
+  # cDC2 / myeloid DC-ish
+  "Sirpa","Clec10a","Itgam",
+  # pDC (mouse)
+  "Siglech","Tcf4","Irf7","Gzmb",
+  # pan-myeloid / antigen presentation
+  "LST1","Fcerg1","H2-Ab1","Cd74"
+)
+genes_extra <- intersect(genes_extra, rownames(seurat_obj))
+
+DotPlot(seurat_obj, features = genes_extra, group.by = "sctype_classification") + RotatedAxis()
+
+```
+# Not T
+
+```{r}
+genes_notT <- c("Cd3d","Cd3e","Cd247","Lck","Itk","Nkg7","Prf1","Gzmb","Lyz2","Tyrobp","Fcerg1","LST1")
+DotPlot(seurat_obj, features = genes_notT, group.by = "sctype_classification") + RotatedAxis()
+```
+
+```{r}
+genes_dc_like <- c(
+  # APC / antigen presentation (DC-like hallmark)
+  "Itgax","Cd74","H2-Ab1",
+  # monocyte-derived / myeloid DC-ish
+  "Itgam","Fcerg1","LST1","Lyz2","Tyrobp",
+  # macrophage/TAM (should be low in CAR-T-cell)
+  "Adgre1","C1qc","Lpl","Mrc1","Fcgr1",
+  # cDC1 (should be low/weak)
+  "Clec9a","Batf3","Irf8","Xcr1",
+  # cDC2 (often Sirpa/Clec10a)
+  "Sirpa","Clec10a",
+  # pDC (should be low/weak)
+  "Siglech","Tcf4","Irf7"
+)
+
+DotPlot(seurat_obj, features = genes_dc_like, group.by = "sctype_classification") + RotatedAxis()
+
+```
+
+
+```{r}
+library(Seurat)
+library(ggplot2)
+
+Idents(seurat_obj) <- "sctype_classification"
+DefaultAssay(seurat_obj) <- "RNA"
+
+# Optional: order identities so CAR-T-cell is next to DC/Mono/Macro for comparison
+lvl <- c("T-cell","NK-cell","B-cell","B/T-cell","DC","CAR-T-cell","Monocyte","Macrophage",
+         "Neutrophils","Endothelial","Fibroblast","Erythrocyte")
+
+genes_notT <- c("Cd3d","Cd3e","Cd247","Lck","Itk","Nkg7","Prf1","Gzmb","Lyz2","Tyrobp","Fcerg1","LST1")
+genes_notT <- unique(intersect(genes_notT, rownames(seurat_obj)))
+# A cleaner color scale for DotPlot (works well for figures)
+dot_theme <- function(p) {
+  p +
+    scale_color_gradientn(colors = c("#f7fbff","#c6dbef","#6baed6","#2171b5","#08306b")) +
+    theme_classic(base_size = 12) +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank(),
+      plot.title = element_text(face = "bold", hjust = 0.5),
+      legend.position = "right"
+    )
+}
+
+
+```
+
+```{r}
+# Cell: Plot 1 (Not T)
+
+seurat_obj$sctype_ordered <- factor(
+  seurat_obj$sctype_classification,
+  levels = c("T-cell","NK-cell","B-cell","B/T-cell","DC","CAR-T-cell","Monocyte","Macrophage",
+             "Neutrophils","Endothelial","Fibroblast","Erythrocyte")
+)
+
+p1 <- DotPlot(
+  seurat_obj,
+  features = genes_notT,
+  group.by = "sctype_ordered",
+  dot.scale = 7
+) +
+  ggtitle("CAR-T-cell cluster is not T (Cd3 genes absent; myeloid genes present)") +
+  RotatedAxis()
+
+dot_theme(p1)   # <- leave this as the LAST line to show it
+
+
+```
+
+```{r}
+genes_notT <- c(
+  # T cell core
+  "Cd3d","Cd3e","Cd247","Lck","Itk",
+  # cytotoxic/NK (to rule out "activated cytotoxic T")
+  "Nkg7","Prf1","Gzmb",
+  # myeloid backbone (what CAR-T-cell is showing)
+  "Lyz2","Tyrobp","Fcerg1","LST1"
+)
+# 
+# genes_notT <- intersect(genes_notT, rownames(seurat_obj))
+
+p1 <- DotPlot(
+  seurat_obj,
+  features = genes_notT,
+  group.by = "sctype_classification",
+  cols = c("lightgrey", "navy"),   # overridden by scale below, but keeps Seurat happy
+  dot.scale = 7
+) +
+  ggtitle("CAR-T-cell cluster is not T: lacks Cd3 genes and shows myeloid program") +
+  RotatedAxis()
+
+dot_theme(p1)
+
+```
+```{r}
+# Plot 2: "DC-like / myeloid APC" marker panel
+
+genes_dc_like <- c(
+  # APC / antigen presentation
+  "Itgax","Cd74","H2-Ab1",
+  # myeloid backbone / moDC-ish
+  "Lyz2","Tyrobp","Fcerg1","LST1","Itgam",
+  # macrophage/TAM (should be low in this cluster)
+  "Adgre1","C1qc","Lpl","Mrc1","Fcgr1",
+  # cDC1
+  "Clec9a","Batf3","Irf8","Xcr1",
+  # cDC2
+  "Sirpa","Clec10a",
+  # pDC
+  "Siglech","Tcf4","Irf7"
+)
+
+genes_dc_like <- unique(intersect(genes_dc_like, rownames(seurat_obj)))
+
+p2 <- DotPlot(
+  seurat_obj,
+  features = genes_dc_like,
+  group.by = "sctype_ordered",
+  dot.scale = 7
+) +
+  ggtitle("CAR-T-cell cluster best matches DC-like / myeloid APC (Itgax+, MHC-II+)") +
+  RotatedAxis()
+
+print(dot_theme(p2))
+
+
+```
+
+
+
+
 
