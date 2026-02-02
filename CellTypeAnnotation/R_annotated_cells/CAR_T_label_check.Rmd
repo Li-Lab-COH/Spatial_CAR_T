@@ -222,9 +222,37 @@ DotPlot(seurat_obj, features = genes_extra, group.by = "sctype_classification") 
 # Not T
 
 ```{r}
-genes_notT <- c("Cd3d","Cd3e","Cd247","Lck","Itk","Nkg7","Prf1","Gzmb","Lyz2","Tyrobp","Fcerg1","LST1")
+genes_notT <- c("Cd3d","Cd3e","Cd247","Ptprc", "Lck","Itk","Nkg7","Prf1","Gzmb","Lyz2","Tyrobp","Fcerg1","LST1", "Cd19")
 DotPlot(seurat_obj, features = genes_notT, group.by = "sctype_classification") + RotatedAxis()
 ```
+```{r}
+# -----------------------------
+# Exhausted T cell (core checkpoints + TF program)
+# -----------------------------
+genes_exhausted_core <- c(
+  "Pdcd1",   # PD-1
+  "Lag3",
+  "Havcr2",  # TIM-3
+  "Tigit",
+  "Ctla4",
+  "Entpd1",  # CD39
+  "Cd160",
+  "Btla",
+  "Tox",
+  "Tox2",
+  "Nr4a1",
+  "Nr4a2",
+  "Nr4a3",
+  "Batf",
+  "Prdm1",   # Blimp1
+  "Irf4",
+  "Eomes"    # context-dependent but common in Tex-like states
+)
+
+DotPlot(seurat_obj, features = genes_exhausted_core, group.by = "sctype_classification") + RotatedAxis()
+
+```
+
 
 ```{r}
 genes_dc_like <- c(
@@ -325,6 +353,7 @@ p1 <- DotPlot(
 dot_theme(p1)
 
 ```
+
 ```{r}
 # Plot 2: "DC-like / myeloid APC" marker panel
 
