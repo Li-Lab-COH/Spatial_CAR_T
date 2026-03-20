@@ -1,0 +1,10 @@
+TGEN_ID=F08543
+LOUPE_ALIGNMENT=/home/janzules/spatial/second_run_images/MouseVIsium_2025/012725-012825_RL_mRT_TMA3-1_TMA2-1/alignment/F08543.json
+CYT_IMAGE=/home/janzules/spatial/second_run_images/MouseVIsium_2025/012725-012825_RL_mRT_TMA3-1_TMA2-1/cytassist/CAVG10409_2025-01-28_13-24-51_012825mRT_TMA2_3_H1-ZNVG8NN_D1_MRT-TMA3.tif
+HNE=/home/janzules/spatial/second_run_images/MouseVIsium_2025/012725-012825_RL_mRT_TMA3-1_TMA2-1/hne/RL_mRTTMA3.jpg
+SLIDE=H1-ZNVG8NN
+AREA=D1
+FASTQS=/home/janzules/spatial/raw_data/for_spaceranger/mouse/F08543
+
+
+tar: Removing leading `/' from member names

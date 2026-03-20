@@ -1,0 +1,10 @@
+TGEN_ID=F07840
+LOUPE_ALIGNMENT=''
+CYT_IMAGE=''
+HNE=''
+SLIDE=H1-QRYKX7B
+AREA=D1
+FASTQS=''
+error: invalid value '' for '--fastqs <PATH>': No such file or directory
+
+For more information, try '--help'.

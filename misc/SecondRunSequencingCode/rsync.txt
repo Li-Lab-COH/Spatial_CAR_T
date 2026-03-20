@@ -1,0 +1,1 @@
+rsync -azv --progress second_run_images /Users/janzules/Roselab/Spatial/Second_sequencing_run_2025/ janzules@apollo-acc.coh.org:/home/janzules/spatial/

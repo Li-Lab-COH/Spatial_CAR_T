@@ -1,0 +1,10 @@
+TGEN_ID=F08545
+LOUPE_ALIGNMENT='/home/janzules/spatial/second_run_images/HumanVisium_2025/070925-071125 hTMA3 hTMA4/alignment/F08545.json'
+CYT_IMAGE='/home/janzules/spatial/second_run_images/HumanVisium_2025/070925-071125 hTMA3 hTMA4/cytassist/CAVG10409_2025-07-10_14-21-27_RL-HTMA3-4_H1-GC64VB8_A1_tma4.tif'
+HNE='/home/janzules/spatial/second_run_images/HumanVisium_2025/070925-071125 hTMA3 hTMA4/hne/RL-hTMA4.tif'
+SLIDE=H1-GC64VB8
+AREA=A1
+FASTQS=/home/janzules/spatial/raw_data/for_spaceranger/human/F08545
+
+
+tar: Removing leading `/' from member names

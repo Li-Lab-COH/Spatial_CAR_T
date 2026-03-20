@@ -1,0 +1,38 @@
+#====================================#
+TGEN_ID=F07839
+LOUPE_ALIGNMENT=/home/janzules/spatial/second_run_images/MouseVIsium_2025/121724-121924_RL_mRT_TMA4_1_TMA5_1/alignment/121924_RL_mRT_TMA4_Slide1.json
+CYT_IMAGE=/home/janzules/spatial/second_run_images/MouseVIsium_2025/121724-121924_RL_mRT_TMA4_1_TMA5_1/cytassist/CAVG10409_2024-12-18_13-08-56_121824RLmRT_H1-QRYKX7B_A1_MRTTMA4.tif
+HNE=/home/janzules/spatial/second_run_images/MouseVIsium_2025/121724-121924_RL_mRT_TMA4_1_TMA5_1/hne/121724_RL_mRT_TMA4_Slide_1.tif
+SLIDE=H1-QRYKX7B
+AREA=A1
+FASTQS=/home/janzules/spatial/raw_data/for_spaceranger/F07839
+#====================================#
+Martian Runtime - v4.0.14
+Serving UI at http://ppxhpcnode04:40018?auth=O4XS5SOxeI8eWC8Se2k4h1d_5vNxPCpPCFyq9MURx14
+
+Running preflight checks (please wait)...
+Checking sample info...
+Checking FASTQ folder...
+Checking reference...
+Checking reference_path (/home/janzules/spatial/software/spaceranger_reference/refdata-gex-GRCm39-2024-A) on ppxhpcnode04...
+Checking read 2 length...
+Checking optional arguments...
+mro: v4.0.14
+mrp: v4.0.14
+python: Python 3.12.3
+numpy: 1.26.4
+scipy: 1.14.1
+pysam: 0.22.1
+h5py: 3.13.0
+pandas: 2.2.3
+STAR: 2.7.2a
+samtools: samtools 1.16.1
+
+[error] The reference genome of the transcriptome 'GRCm39' and probe set 'mm10' must be identical.
+
+2025-10-13 21:03:43 Shutting down.
+Saving pipestance info to "/home/janzules/spatial/second_run_output/mouse/mouse.mri.tgz"
+For assistance, upload this file to 10x Genomics by running:
+
+spaceranger upload <your_email> "/home/janzules/spatial/second_run_output/mouse/mouse.mri.tgz"
+

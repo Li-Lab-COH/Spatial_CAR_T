@@ -1,0 +1,10 @@
+TGEN_ID=''
+LOUPE_ALIGNMENT=''
+CYT_IMAGE=''
+HNE=''
+SLIDE=''
+AREA=''
+FASTQS=''
+error: invalid value '' for '--fastqs <PATH>': No such file or directory
+
+For more information, try '--help'.
