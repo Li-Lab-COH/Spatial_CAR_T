@@ -217,7 +217,7 @@ def main() -> None:
     inf_preview.to_csv(run_name / "inf_aver_preview.csv")
     print(f"[{now_str()}] inf_aver shape: {inf_aver.shape}")
 
-    # Find shared genes and subset
+    # Find shared genes and subset - This shouldn't be necessary if data prep was done correctly, but good to check
     intersect = np.intersect1d(adata_vis.var_names, inf_aver.index)
     print(f"[{now_str()}] Shared genes (intersect): {len(intersect)}")
 
