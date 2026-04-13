@@ -32,7 +32,7 @@ ACCELERATOR="gpu"
 # =========================================================
 
 PROJ="/coh_labs/yunroseli/Jona/CAR-T"
-SCRIPT="/coh_labs/yunroseli/Jona/CAR-T/code/CellTypeAnnotation/Mapping_script.py"
+SCRIPT="/home/janzules/spatial/CAR-T/code/CellTypeAnnotation/Mapping_script.py"
 
 mkdir -p ./slurmOutput
 
