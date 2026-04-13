@@ -1,0 +1,9 @@
+
+This Mamba module can be used to create/manage your own Mamba/Conda environments
+
+ Eg: To create, load, and install a Mamba environment, the following can be
+used: 
+   mamba create -n MyEnv
+   mamba activate MyEnv
+   mamba install examplesoftware
+python: can't open file '/coh_labs/yunroseli/Jona/CAR-T/code/CellTypeAnnotation/Mapping_script.py': [Errno 2] No such file or directory
