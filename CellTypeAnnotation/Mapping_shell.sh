@@ -4,16 +4,16 @@
 # To change GPU count or memory at submission time:
 #   sbatch --gres=gpu:2 --mem=300G Mapping_shell.sh
 # =========================================================
-#SBATCH --job-name=c2l_map
+#SBATCH --job-name=c2l_map_v100
 #SBATCH -n 1
 #SBATCH --cpus-per-task=24
 #SBATCH -N 1-1
-#SBATCH -p gpu-a100
+#SBATCH -p gpu-v100
 #SBATCH --gres=gpu:3
 #SBATCH --mem=240G
-#SBATCH --time=10:00:00
-#SBATCH --output=./slurmOutput/c2l_map_%j.log
-#SBATCH --error=./slurmOutput/c2l_map_%j.err
+#SBATCH --time=20:00:00
+#SBATCH --output=./slurmOutput/v100_c2l_map_%j.log
+#SBATCH --error=./slurmOutput/v100_c2l_map_%j.err
 
 set -eo pipefail
 
@@ -25,8 +25,8 @@ EPOCHS=200
 BATCH_SIZE=16384
 DETECTION_ALPHA=200
 N_CELLS_PER_LOCATION=1.5
-EXPORT_NUM_SAMPLES=1000
-EXPORT_BATCH_SIZE=16384
+EXPORT_NUM_SAMPLES=200 #1000
+EXPORT_BATCH_SIZE=1024 #16384
 NUM_WORKERS=23             # Should be cpus-per-task minus 1
 ACCELERATOR="gpu"
 # =========================================================

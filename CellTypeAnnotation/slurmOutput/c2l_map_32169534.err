@@ -1,0 +1,16 @@
+
+This Mamba module can be used to create/manage your own Mamba/Conda environments
+
+ Eg: To create, load, and install a Mamba environment, the following can be
+used: 
+   mamba create -n MyEnv
+   mamba activate MyEnv
+   mamba install examplesoftware
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/lightning/pytorch/trainer/configuration_validator.py:68: You passed in a `val_dataloader` but have no `validation_step`. Skipping val loop.
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1,2]
+SLURM auto-requeueing enabled. Setting signal handlers.
+`Trainer.fit` stopped: `max_epochs=200` reached.
+/opt/tgen/slurm/var/spool/job32169534/slurm_script: line 60: 2450589 Killed                  python -u "${SCRIPT}" --proj-folder "${PROJ}" --level "${LEVEL}" --epochs "${EPOCHS}" --train-batch-size "${BATCH_SIZE}" --detection-alpha "${DETECTION_ALPHA}" --N-cells-per-location "${N_CELLS_PER_LOCATION}" --export-num-samples "${EXPORT_NUM_SAMPLES}" --export-batch-size "${EXPORT_BATCH_SIZE}" --num-workers "${NUM_WORKERS}" --accelerator "${ACCELERATOR}"
+slurmstepd: error: Detected 1 oom_kill event in StepId=32169534.batch. Some of the step tasks have been OOM Killed.
