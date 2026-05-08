@@ -1,0 +1,14 @@
+
+This Mamba module can be used to create/manage your own Mamba/Conda environments
+
+ Eg: To create, load, and install a Mamba environment, the following can be
+used: 
+   mamba create -n MyEnv
+   mamba activate MyEnv
+   mamba install examplesoftware
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/lightning/pytorch/trainer/configuration_validator.py:68: You passed in a `val_dataloader` but have no `validation_step`. Skipping val loop.
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1,2]
+SLURM auto-requeueing enabled. Setting signal handlers.
+slurmstepd: error: *** JOB 32216840 ON g-g-1-7-14 CANCELLED AT 2026-04-22T02:07:23 DUE TO TIME LIMIT ***

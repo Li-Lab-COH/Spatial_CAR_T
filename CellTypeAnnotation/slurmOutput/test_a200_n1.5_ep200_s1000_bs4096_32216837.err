@@ -1,0 +1,16 @@
+
+This Mamba module can be used to create/manage your own Mamba/Conda environments
+
+ Eg: To create, load, and install a Mamba environment, the following can be
+used: 
+   mamba create -n MyEnv
+   mamba activate MyEnv
+   mamba install examplesoftware
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+/home/janzules/mamba_envs/spatial_gpu_py311/lib/python3.11/site-packages/lightning/pytorch/trainer/configuration_validator.py:68: You passed in a `val_dataloader` but have no `validation_step`. Skipping val loop.
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1,2]
+SLURM auto-requeueing enabled. Setting signal handlers.
+`Trainer.fit` stopped: `max_epochs=200` reached.
+/opt/tgen/slurm/var/spool/job32216837/slurm_script: line 15: 380761 Killed                  python -u '/home/janzules/spatial/CAR-T/code/CellTypeAnnotation/Mapping_script_test.py' --proj-folder '/coh_labs/yunroseli/Jona/CAR-T' --level '1' --epochs '200' --train-batch-size '16384' --detection-alpha '200' --N-cells-per-location '1.5' --export-num-samples '1000' --export-batch-size '4096' --num-workers '23' --accelerator 'gpu'
+slurmstepd: error: Detected 1 oom_kill event in StepId=32216837.batch. Some of the step tasks have been OOM Killed.
