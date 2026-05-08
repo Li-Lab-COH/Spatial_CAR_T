@@ -132,7 +132,7 @@ batch_num = 8192
 
 # Rescue posterior sample number.
 # Lower = faster, but q05/q95 estimates are noisier.
-export_num = 120
+export_num = 120 #500 for final submission use this
 
 level = 1
 levels = ["cell_type_lvl1", "cell_type_lvl2", "cell_type_lvl3"]
@@ -302,34 +302,158 @@ print_header("Load saved cell2location model")
 
 mem_report("before model load")
 
-print(f"Loading saved cell2location model from:\n{run_name}", flush=True)
+print(f"\nReconstructing saved cell2location model manually from:\n{run_name}", flush=True)
 
-mod = cell2location.models.Cell2location.load(
-    f"{run_name}",
-    adata_vis,
+model_file = Path(run_name) / "model.pt"
+
+ckpt = torch.load(
+    model_file,
+    map_location="cpu",
+    weights_only=False,
 )
 
-print("Saved model loaded successfully.", flush=True)
+attr = ckpt["attr_dict"]
 
-try:
-    print(f"mod.is_trained: {mod.is_trained}", flush=True)
-except Exception as e:
-    print(f"Could not print mod.is_trained: {repr(e)}", flush=True)
+print("Checkpoint loaded.", flush=True)
+print("Checkpoint keys:", list(ckpt.keys()), flush=True)
+print("attr_dict keys:", list(attr.keys()), flush=True)
+print("is_trained_:", attr.get("is_trained_", "MISSING"), flush=True)
 
-try:
-    print(f"mod.adata shape: {mod.adata.shape}", flush=True)
-except Exception as e:
-    print(f"Could not print mod.adata shape: {repr(e)}", flush=True)
+# Use the exact saved gene order from the trained model.
+saved_genes = pd.Index(ckpt["var_names"].astype(str))
 
-print(f"adata_vis shape: {adata_vis.shape}", flush=True)
+missing_genes = saved_genes.difference(adata_vis.var_names)
+if len(missing_genes) > 0:
+    raise ValueError(
+        f"{len(missing_genes)} saved model genes are missing from adata_vis. "
+        f"First few missing genes: {list(missing_genes[:10])}"
+    )
+
+# Use the exact cell_state_df saved inside the model checkpoint.
+cell_state_df_saved = attr["init_params_"]["non_kwargs"]["cell_state_df"].copy()
+
+# Reorder both spatial data and reference signatures to match the saved model.
+adata_vis = adata_vis[:, saved_genes].copy()
+cell_state_df_saved = cell_state_df_saved.loc[saved_genes, :].copy()
+
+print(f"adata_vis shape after saved-gene ordering: {adata_vis.shape}", flush=True)
+print(f"cell_state_df_saved shape: {cell_state_df_saved.shape}", flush=True)
+
+# Register AnnData exactly as in training.
+cell2location.models.Cell2location.setup_anndata(
+    adata=adata_vis,
+    batch_key="TMA"
+)
+
+# Recover the exact model kwargs used during training.
+model_kwargs = attr["init_params_"]["kwargs"]["model_kwargs"].copy()
+
+print("Model kwargs from checkpoint:", model_kwargs, flush=True)
+
+# Recreate the model architecture.
+mod = cell2location.models.Cell2location(
+    adata_vis,
+    cell_state_df=cell_state_df_saved,
+    **model_kwargs,
+)
+
+# Load the trained PyTorch module parameters and restore the Pyro ParamStore.
+# In cell2location/scvi Pyro models, the posterior guide parameters are not
+# ordinary torch module weights. They live in Pyro's ParamStore.
+import pyro
+from collections import OrderedDict
+
+full_state = ckpt["model_state_dict"]
+
+# Separate standard torch module state from Pyro guide / ParamStore state.
+module_state = OrderedDict(
+    (k, v)
+    for k, v in full_state.items()
+    if (k != "pyro_param_store") and (not k.startswith("_guide."))
+)
+
+print(f"Full checkpoint state keys: {len(full_state)}", flush=True)
+print(f"Module-state keys to load into mod.module: {len(module_state)}", flush=True)
+
+load_result = mod.module.load_state_dict(
+    module_state,
+    strict=False,
+)
+
+print("Torch module state loaded.", flush=True)
+print("Missing keys:", load_result.missing_keys, flush=True)
+print("Unexpected keys:", load_result.unexpected_keys, flush=True)
+
+if len(load_result.missing_keys) > 0:
+    raise RuntimeError(
+        "Manual model restore had missing module keys. "
+        "Do not proceed to export until this is resolved. "
+        f"Missing keys: {load_result.missing_keys}"
+    )
+
+if len(load_result.unexpected_keys) > 0:
+    raise RuntimeError(
+        "Manual model restore had unexpected module keys after filtering. "
+        "Do not proceed to export until this is resolved. "
+        f"Unexpected keys: {load_result.unexpected_keys}"
+    )
+
+# Restore Pyro's global parameter store.
+if "pyro_param_store" not in full_state:
+    raise RuntimeError(
+        "Checkpoint does not contain 'pyro_param_store'. "
+        "Cannot safely restore the variational posterior guide parameters."
+    )
+
+pyro.clear_param_store()
+pyro.get_param_store().set_state(full_state["pyro_param_store"])
+
+param_store_state = pyro.get_param_store().get_state()
+param_names = list(param_store_state["params"].keys())
+
+print("Pyro ParamStore restored.", flush=True)
+print(f"Number of Pyro params: {len(param_names)}", flush=True)
+print("First 10 Pyro params:", param_names[:10], flush=True)
+
+expected_substrings = [
+    "w_sf",
+    "detection_y_s",
+    "n_s_cells_per_location",
+]
+
+for substring in expected_substrings:
+    matches = [p for p in param_names if substring in p]
+    print(f"ParamStore params containing '{substring}': {len(matches)}", flush=True)
+    print(matches[:5], flush=True)
+
+# Restore useful trained-model metadata.
+for key in [
+    "factor_names_",
+    "detection_mean_",
+    "cell_state_df_",
+    "n_factors_",
+    "history_",
+    "is_trained_",
+    "train_indices_",
+    "test_indices_",
+    "validation_indices_",
+    "run_id_",
+    "run_name_",
+]:
+    if key in attr:
+        setattr(mod, key, attr[key])
+
+mod.is_trained_ = True
+mod.module.eval()
+
+print("Manual model reconstruction successful.", flush=True)
+print("mod.is_trained_:", getattr(mod, "is_trained_", "MISSING"), flush=True)
 
 try:
     mod.view_anndata_setup()
 except Exception as e:
-    print("WARNING: mod.view_anndata_setup() failed.", flush=True)
+    print("WARNING: mod.view_anndata_setup() failed after manual restore.", flush=True)
     print(repr(e), flush=True)
-
-gc.collect()
 mem_report("after model load")
 
 
@@ -351,8 +475,7 @@ adata_vis = mod.export_posterior(
     add_to_obsm=["means", "q05", "q95"],
     sample_kwargs={
         "num_samples": export_num,
-        "batch_size": batch_num,
-        "use_gpu": False,
+        "batch_size": batch_num
     },
 )
 
