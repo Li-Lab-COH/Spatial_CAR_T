@@ -132,7 +132,7 @@ batch_num = 8192
 
 # Rescue posterior sample number.
 # Lower = faster, but q05/q95 estimates are noisier.
-export_num = 120 #500 for final submission use this
+export_num = 400 #600 died with 800GB
 
 level = 1
 levels = ["cell_type_lvl1", "cell_type_lvl2", "cell_type_lvl3"]
