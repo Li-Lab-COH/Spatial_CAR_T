@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data (don't commit raw spatial data — too large)
+*.zarr/
+*.h5ad
+data/
+*.csv
+!notebooks/example_*.csv
+
+# Outputs
+results/
+outputs/
+*.png
+*.pdf
+!notebooks/figures_for_readme/*.png
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# Secrets
+.env
+*.key
