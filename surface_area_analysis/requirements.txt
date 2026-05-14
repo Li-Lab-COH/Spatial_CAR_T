@@ -1,0 +1,8 @@
+numpy
+pandas
+matplotlib
+spatialdata
+alphashape
+shapely
+scipy
+jupyter
