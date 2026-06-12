@@ -41,7 +41,14 @@ NCOLS = 4
 PANEL_SIZE = 6.0
 IMAGE_SCALE = None  # None = auto-pick pyramid level to match panel size
 
-PANEL_COLOR = "#0033CC"  # strong blue, used for every panel
+# Cell color: saturated green contrasts strongly against pink/purple H&E
+# (green is ~complementary to magenta) and stays visible in dense regions where
+# dark blue blended into the hematoxylin.
+PANEL_COLOR = "#00C400"  # vivid green, used for every panel
+
+# H&E background opacity. Lower = more faded/brighter background so the colored
+# cells stand out. 0.85 was too saturated; 0.35-0.45 reads well.
+IMAGE_ALPHA = 0.40
 
 # Fixed cell-type display order (lineage-grouped), excluding 'Unknown'.
 CELL_TYPE_ORDER = [
@@ -128,7 +135,7 @@ def render_one_tissue(tissue, out_png, dpi, ncols, panel_size, image_scale):
         print(f"  {tissue}: {cell_type}")
         (
             sdata_t.pl
-            .render_images(img_key, scale=image_scale, norm=Normalize(0, 255), alpha=0.85)
+            .render_images(img_key, scale=image_scale, norm=Normalize(0, 255), alpha=IMAGE_ALPHA)
             .pl.render_shapes(
                 shape_key, color=LABEL_COL, groups=[cell_type],
                 palette=[PANEL_COLOR], table_name=TABLE_NAME,
