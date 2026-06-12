@@ -30,9 +30,9 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 ZARR_FILE = "/coh_labs/yunroseli/Jona/CAR-T/data/zarr/fullDataset/processing_Zarr/1_C2l_annotations_400"
 FIGURES_FOLDER = "/home/janzules/spatial/CAR-T/figures"
-FINAL_PDF_NAME = "c2l_label_perm_all_tissues_celltypes_present.pdf"
+FINAL_PDF_NAME = "c2l_permissive_all_tissues_celltypes_present.pdf"
 
-LABEL_COL = "c2l_label_perm"
+LABEL_COL = "c2l_permissive"
 TISSUE_COL = "tissue"
 TABLE_NAME = "segmentation_counts"
 
