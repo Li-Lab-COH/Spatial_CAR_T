@@ -8,6 +8,68 @@ Notebooks run on the `spatial_gpu_py311` HPC kernel. All helper functions are **
 because the kernel runs on the HPC node and cannot see these local files (same reason as
 `Hotspot_Abscopal_Comparison.ipynb`).
 
+> **RESOLVED in 09 — radiation does NOT increase fatty-acid processing in SPP1-TAMs, and the
+> null is dataset-wide, not TAM-specific.**
+>
+> Run on `annotation_v4.h5ad` with the SPP1-TAM population defined **four independent ways**
+> (signature global / within-sample / Alice's `cell_type_lvl4 == Spp1_pos_mac` / `M2_like_Mac`).
+> Same answer under all four.
+>
+> - **Fatty-acid composite** (20 lipid/FA/oxidative sets, internal-reference corrected) is flat
+>   across every arm: NoTx +0.063, CyPSCA +0.057, RTCyPSCA +0.055, CyTAG72 +0.058, RTCyTAG72 +0.059.
+>   RT deltas −0.003..+0.002 against a within-arm sd of 0.0058.
+> - **Power is not the problem.** The same readout separates Spp1-high from Spp1-low macrophages
+>   by +0.0259 (Cohen d 1.24, positive in 29/29 samples). MDE = 0.0093 ≈ **36% of the state axis** —
+>   an RT effect a third the size of the SPP1-TAM state itself would have been caught.
+> - **Gene level:** 0 genes at q<0.05 in either background. Cross-background logFC r = −0.288,
+>   **permutation p = 0.49** — inside its own null. Benchmark through the identical pipeline:
+>   treated-vs-NoTx r = **+0.888**, p = 0.004.
+> - **RT is invisible in every compartment** (macs, monocytes, tumour, neutrophils, cDC, all cells),
+>   while Cy+CAR-T is reproducible (r = +0.76..+0.89) in every one. So this is **not** an
+>   SPP1-TAM-specific null.
+> - **Within-mouse irradiated-vs-abscopal (Tu1−Tu2)** is null too, and the **non-RT control pair is
+>   more internally consistent (r = +0.62) than the RT pair (r = +0.54)** — that Tu1/Tu2 difference
+>   is the tumour *site*, not the beam.
+>
+> **Do not write "RT increases fatty acid processing in SPP1-TAMs."** The SPP1-TAM lipid program is
+> real and strong (01c); what is absent is an effect *of radiation* on it. A first pass showed an
+> apparent metabolic shift that was entirely a **per-sample library-complexity offset** — the
+> giveaway was `TNFA_NFKB` (a control pathway) being the largest mover, with opposite signs in the
+> two CAR-T backgrounds.
+>
+> **Where an RT signal could still live:** spatial organisation rather than cell-intrinsic
+> expression (notebook 08, drafted but not run), or an earlier timepoint — these are endpoint
+> tumours and an acute RT response would have resolved.
+
+> **THE ONE SURVIVING RT FINDING (08 §C + 08b) — radiation changes the *range* of the
+> SPP1-TAM↔niche coupling, not its strength, and not the macrophages' metabolism.**
+>
+> Of 08's four readouts, **three are null** and two of those fail 08's own artifact rule (their
+> contrast tier moved more than their metabolic tier): §A Moran's I (sign disagrees across
+> backgrounds), §B coupling at 50 µm (metabolic −0.010 vs contrast +0.009), §D macrophage-intrinsic
+> pathways (metabolic −0.008 vs contrast +0.010; **FA metabolism −0.016, OXPHOS −0.030 — down, not
+> up**). §C is the only positive, so `08b` put it through the four controls §C never ran:
+>
+> | control | result |
+> |---|---|
+> | contrast tier, **pooled** | **FAILS** — IFN-γ far-field inflates 7.3× |
+> | background-matched design (the project rule) | **PASSES** — metabolic +0.29, damage +0.44, both sign-agree in PSCA *and* T72; contrast tier +0.009 (flat) |
+> | shape, not amplitude | **PASSES** — near-field amplitude ratio 1.07 (unchanged); only the far/near *ratio* moves |
+> | niche field not itself coarser | **PASSES** — non-myeloid field's own far-band autocorrelation +0.004 |
+>
+> **Wording the controls license:** *adding RT on top of Cy + CAR-T did not change how strongly
+> SPP1-TAMs couple to the damage/lipid niche, how clustered the program is, or the macrophages'
+> own metabolic scores. What changed is the **spatial range** of that coupling — it decays to
+> ~37% of its near-field value by 100–150 µm without RT, and persists at ~68–98% with it.*
+>
+> **Systemic, not a local dose effect** — abscopal tumours show it at least as strongly as
+> irradiated ones (metabolic shape 0.98 vs 0.68). Never word it as a local beam effect.
+>
+> **Limitations to state, not bury:** 1 positive of 4 readouts; n = 2–4 tissues/side and the
+> p = 0.026 is tissue-level pooling pathways, not mouse-level; the contrast-tier control is
+> underpowered (0 usable non-RT CyT72 tissues) and **does** inflate when pooled — this is the
+> weakest link. It does **not** rescue a fatty-acid claim.
+
 ## Run order
 
 > **STATUS — the Spp1 *measurement* is broken in spatial; the *biology* is not.**
@@ -57,6 +119,9 @@ because the kernel runs on the HPC node and cannot see these local files (same r
 | `02_pathway_hotspots_and_spp1_enrichment.ipynb` | *Which pathway niches (hypoxia, adenosine, lipid) do they live in?* | Result is a **lead**, not a conclusion, until 03 Part A. |
 | `03_niche_control_and_celltype_neighborhood.ipynb` | *Does 02 survive a circularity control? What cell types surround them?* | Part A decides whether 02 stands. |
 | `04_liana_spp1_cd44.ipynb` | *How does the (tumour-driven) Spp1-CD44 axis vary by condition; do Spp1+ macs localize to it?* | Reframed: axis is tumour-derived (01c). Now asks localization, not macrophage-driving. |
+| `08_rt_effect_spatial_statistics.ipynb` | *Does RT make the SPP1-TAM program more spatially organised / niche-coupled?* | **Run.** §A/§B/§D null (two fail their own contrast-tier control). §C positive → gated on `08b`. |
+| `08b_rt_range_controls.ipynb` | *Does §C survive the four controls it never ran?* | **Yes, 3 of 4.** The one surviving RT finding in the project. |
+| `09_rt_effect_on_spp1tam_state_sc.ipynb` | *Does RT shift SPP1-TAMs toward fatty-acid processing? (single-cell)* | **Done — clean, powered NULL.** See the RESOLVED block at the top. |
 
 Each ends with a printed `SUMMARY — report these back` block meant to be pasted back for the
 next iteration. `spp1Analysis.ipynb` is left empty as scratch space.
