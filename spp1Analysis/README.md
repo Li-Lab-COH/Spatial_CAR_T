@@ -70,6 +70,36 @@ because the kernel runs on the HPC node and cannot see these local files (same r
 > underpowered (0 usable non-RT CyT72 tissues) and **does** inflate when pooled — this is the
 > weakest link. It does **not** rescue a fatty-acid claim.
 
+> **10 — the axis that actually moves SPP1-TAMs is WHICH CAR, not radiation.**
+>
+> Pseudobulk DESeq2 (summed raw counts) → weighted-KS **GSEA NES** (the `01c` §4d engine, not the
+> rank-sum `z` used in 09), on SPP1-TAMs, site-resolved. 09 had only run RT with tumour site
+> collapsed into a covariate; tiers A–E here add the irradiated-only, abscopal-only, within-mouse,
+> difference-in-differences and CAR-axis contrasts.
+>
+> **The finding — PSCA vs TAG72, 342 / 192 genes at padj<0.05.** Nine pathways clear FDR<0.05 in
+> **both** the non-RT and RT strata with the same sign, all **up in PSCA**: IFN-γ (NES +3.15/+3.24),
+> IFN-α (+2.71/+2.88), hypoxia (+2.53/+2.07), IL6-JAK-STAT3 (+2.50/+2.03), allograft rejection,
+> inflammatory response, complement, glycolysis, phagocytosis. Top genes are interferon-induced
+> GTPases — `Gbp2`, `Gbp5`, `Gbp2b`, `Tgtp1`, `Irf1`, `Socs1`. Replicating across RT status *is*
+> the reproducibility control.
+>
+> **Do NOT claim a reciprocal lipid shift toward TAG72.** Zero pathways are reproducibly negative;
+> the lipid sets flip sign between strata (lipid droplet −0.96 → +0.59, FA metabolism +1.21 → −1.24).
+> The axis is one-sided: interferon up in PSCA, nothing reliable on the other end.
+>
+> **RT is null again, abscopal included.** Tier A gives 1–19 genes; cross-background NES
+> r = **−0.285** (irradiated) and **+0.163** (abscopal) against a detection-check benchmark of
+> **+0.840**. Holds under all three population definitions (M2_all, Alice's `Spp1_pos_mac`).
+>
+> **One RT signal, leverage-limited.** Within-mouse Tu1−Tu2 gives 40 (PSCA) + 129 (TAG72) genes in
+> RT arms vs 6 + 4 in the non-RT control arms — but the **DiD cross-background r = +0.019**, and the
+> control arms' own NES reproducibility (+0.403) nearly matches the RT arms' (+0.542). So RT
+> enlarges the irradiated-vs-abscopal gap without the two CAR backgrounds agreeing on what changes
+> — the same shape as the `cart × RT` interaction `rtAdvantage/02b` found in **cell-type
+> composition** (8.7% of CLR variance vs 3.5% for the RT main effect). Note 02b is composition
+> and this is expression: two modalities agreeing, not one result quoted twice.
+
 ## Run order
 
 > **STATUS — the Spp1 *measurement* is broken in spatial; the *biology* is not.**
@@ -122,9 +152,54 @@ because the kernel runs on the HPC node and cannot see these local files (same r
 | `08_rt_effect_spatial_statistics.ipynb` | *Does RT make the SPP1-TAM program more spatially organised / niche-coupled?* | **Run.** §A/§B/§D null (two fail their own contrast-tier control). §C positive → gated on `08b`. |
 | `08b_rt_range_controls.ipynb` | *Does §C survive the four controls it never ran?* | **Yes, 3 of 4.** The one surviving RT finding in the project. |
 | `09_rt_effect_on_spp1tam_state_sc.ipynb` | *Does RT shift SPP1-TAMs toward fatty-acid processing? (single-cell)* | **Done — clean, powered NULL.** See the RESOLVED block at the top. |
+| `10_spp1tam_behaviour_by_condition_sc.ipynb` | *What are SPP1-TAMs doing in each condition? Pseudobulk DE → GSEA NES, site-resolved* | **Done.** The standout is the **CAR axis**, not RT. |
+| `11_myeloid_abundance_by_condition_sc.ipynb` | *Is the 51% CLR-variance `M1_like_Mac` CAR effect an expansion or a loss; does one mouse carry it; is it in both RT strata?* | **Done.** One point per sample, mice paired Tu1→Tu2. |
+| `12_myeloid_trajectory_scfates.ipynb` | *Is there a monocyte → macrophage → SPP1/TREM2-TAM ordering, where does it branch, what changes along it?* (scFates) | **Drafted, not yet run.** Runs **locally** on the `traj_r_py311` kernel, not on the HPC. §6's four controls gate everything downstream. |
+| `13_spp1tam_fate_cellrank.ipynb` | *Terminal states, per-cell P(SPP1-TAM), driver genes, and whether treatment moves the probability* (CellRank) | **Drafted, not yet run.** Local, same kernel; consumes 12's h5ad. No velocity kernel is possible here — see the header. |
 
 Each ends with a printed `SUMMARY — report these back` block meant to be pasted back for the
 next iteration. `spp1Analysis.ipynb` is left empty as scratch space.
+
+### Kernels
+
+`01`–`11` run on the **HPC** kernel `spatial_gpu_py311`. **`12`–`13` run LOCALLY on the Mac**, on
+a kernel called **`traj_r_py311`** (*"traj_r_py311 (scFates+R/CellRank)"*), at
+`~/miniforge3/envs/traj_r_py311`. Nothing about them needs the cluster — `annotation_v4.h5ad`,
+`mac_annotation_v5.h5ad`, the pathway GMTs and the signature are all in
+`/Users/janzules/Roselab/Spatial/CAR_T`, and 79k myeloid cells fit comfortably in 36 GB. They
+resolve the project root by trying the local path first, then the two `/coh_labs` spellings, so
+the same file also runs unchanged on the cluster.
+
+**Why these two need their own kernel at all:** `scf.tl.test_association`, `scf.tl.fit`,
+`scf.tl.cluster`, `scf.tl.test_fork` and `scf.tl.activation` fit their GAMs through **R's `mgcv`
+over rpy2**. That is a hard requirement — a pip-only environment fails with *"rpy2 installation
+is necessary for testing feature association to the tree"*. The env therefore bundles its own
+R 4.3 + mgcv rather than binding to the system R at `/Library/Frameworks/R.framework`, so it
+cannot be broken by an R upgrade. Its `kernel.json` sets `R_HOME`; **without `R_HOME` rpy2 dies
+at import** with `openrlib.R_HOME cannot be None`. `12` §1 checks rpy2 up front, so a missing R
+surfaces in two seconds rather than an hour in.
+
+Contents: scFates 1.2.5, CellRank 2.0.7, palantir 1.4.5, pygpcca 1.0.4, elpigraph-python 0.3.4,
+simpleppt 1.1.7, harmonypy 2.0.2, scvelo 0.3.4, pygam 0.12.0, on scanpy 1.11.5 / anndata 0.12.19.
+
+`N_JOBS` auto-sets to half the logical core count — an M3 Pro reports 12 but has 6 *performance*
+cores, and handing GAM fits to the efficiency cores makes the step slower, not faster.
+
+> Equivalent envs also exist on the HPC (`~/mamba_envs/traj_r_py311`, plus a no-R fallback
+> `~/mamba_envs/traj_py311`) from the first pass at this, if the work ever needs to move there.
+
+> **There is no RNA velocity in this project and there cannot be**, short of re-running alignment
+> from the FASTQs: no `.loom`, no velocyto output, no `spliced`/`unspliced` layer anywhere under
+> the data tree. `scvelo` is installed only as a CellRank dependency. So CellRank runs on a
+> pseudotime kernel, which makes `13` a soft-assignment layer over `12` rather than an
+> independent opinion about it — `13`'s header says so, and it is the main caveat on that notebook.
+
+> **`mac_annotation_v5.h5ad` is macrophages only** (48,475 cells, no monocytes), so it cannot
+> carry a monocyte→TAM trajectory; `12` uses `annotation_v4.h5ad`. What it *is* needed for is its
+> `cell_type_lvl4` (`Spp1_pos_mac`) call, the independent check on the terminal state. Those three
+> label columns were extracted to `results/spp1_analysis/mac_lvl3_lvl4_lvl5_labels.parquet`
+> (48,475 × 3, 0.5 MB) and that is what the notebooks read; the 4 GB h5ad is used only as a
+> fallback.
 
 ## Setup facts (verified, not assumed)
 
