@@ -100,6 +100,14 @@ because the kernel runs on the HPC node and cannot see these local files (same r
 > composition** (8.7% of CLR variance vs 3.5% for the RT main effect). Note 02b is composition
 > and this is expression: two modalities agreeing, not one result quoted twice.
 
+> **14 — MARCO is not widely expressed.** `Marco` (on the PDF's SPP1-TAM readout list) is detected in **82 of 93,548
+> cells (0.09%)**; no population exceeds 0.5% (project detection floor: 5-10%). The highest is the `Apoe_high_Mac` /
+> SPP1-TAM state (~0.4%). **Tumour cells: 4 of 6,614 (0.06%)**, indistinguishable from the leakage any equally rare myeloid
+> gene shows in tumour cells. **Suppressive myeloid cells** (M2-like TAMs, classical monocytes, N1/N2 neutrophils) are
+> 0-0.3%, and cells high on a suppressive program are *not* enriched. Where Marco is detected it follows the Apoe-high /
+> lipid-TREM2 state (~2-7x enriched at matched depth), not Spp1 transcript. The spatial object agrees (0.06% of 2.09M
+> cells, no label measurable). RNA only — MARCO protein would need flow or IHC.
+
 ## Run order
 
 > **STATUS — the Spp1 *measurement* is broken in spatial; the *biology* is not.**
@@ -156,6 +164,7 @@ because the kernel runs on the HPC node and cannot see these local files (same r
 | `11_myeloid_abundance_by_condition_sc.ipynb` | *Is the 51% CLR-variance `M1_like_Mac` CAR effect an expansion or a loss; does one mouse carry it; is it in both RT strata?* | **Done.** One point per sample, mice paired Tu1→Tu2. |
 | `12_myeloid_trajectory_scfates.ipynb` | *Is there a monocyte → macrophage → SPP1/TREM2-TAM ordering, where does it branch, what changes along it?* (scFates) | **Drafted, not yet run.** Runs **locally** on the `traj_r_py311` kernel, not on the HPC. §6's four controls gate everything downstream. |
 | `13_spp1tam_fate_cellrank.ipynb` | *Terminal states, per-cell P(SPP1-TAM), driver genes, and whether treatment moves the probability* (CellRank) | **Drafted, not yet run.** Local, same kernel; consumes 12's h5ad. No velocity kernel is possible here — see the header. |
+| `SpecificGenes/marco_expression_sc.ipynb` (moved out of this folder) | *Is MARCO expressed in tumour cells, SPP1-expressing macrophages or suppressive myeloid cells — and widely at all?* Detection for every population, tumour-leakage control, 7 SPP1 definitions, suppressive program, spatial check | **Done.** No — see the block at the top. Local, `spatial_cpu_py311`. |
 
 Each ends with a printed `SUMMARY — report these back` block meant to be pasted back for the
 next iteration. `spp1Analysis.ipynb` is left empty as scratch space.
@@ -178,6 +187,8 @@ R 4.3 + mgcv rather than binding to the system R at `/Library/Frameworks/R.frame
 cannot be broken by an R upgrade. Its `kernel.json` sets `R_HOME`; **without `R_HOME` rpy2 dies
 at import** with `openrlib.R_HOME cannot be None`. `12` §1 checks rpy2 up front, so a missing R
 surfaces in two seconds rather than an hour in.
+
+`14` also runs locally, on `spatial_cpu_py311` (it additionally streams the local spatial zarr for a detection-only check).
 
 Contents: scFates 1.2.5, CellRank 2.0.7, palantir 1.4.5, pygpcca 1.0.4, elpigraph-python 0.3.4,
 simpleppt 1.1.7, harmonypy 2.0.2, scvelo 0.3.4, pygam 0.12.0, on scanpy 1.11.5 / anndata 0.12.19.

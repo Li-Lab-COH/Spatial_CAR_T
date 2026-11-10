@@ -144,9 +144,64 @@ single mapping table that the later notebooks read rather than re-typing.
 | `01_composition_sc.ipynb` | *Does RT change what the TME is made of — and does it change it in the abscopal tumour?* CLR composition, DiD, cross-background concordance against the treated-vs-NoTx benchmark. | **Written and dry-run locally — see below.** Re-run on the kernel to confirm. |
 | `02_pairwise_cell_counts_sc.ipynb` | *Every group against every other group, every cell type separately, nothing collapsed.* 45 pairs x 18 cell types = 810 comparisons, unadjusted p on two scales, plus the Tu1/Tu2 site control and a ranked DE-follow-up shortlist. | **Written and dry-run — see below.** This is the exhaustive pass `01`'s summary statistic could not substitute for. |
 | `02b_composition_deep_dive.ipynb` | *Why does the pairwise table look the way it does?* Variance decomposition, Aitchison PCA + PERMANOVA, the `CAR x RT` interaction and its four controls, 10x10 fold-change grids, volcanoes, per-mouse small multiples for all 18 cell types, cell-type co-variation, effect size by contrast type, equal-depth downsampling. **10 figures, 9 tables.** | **Written and dry-run.** |
-| `03_tumour_state_sc.ipynb` | *Does RT change the tumour cell — antigen presentation, IFN response, death-receptor sensitivity, senescence/SASP?* | Planned. |
-| `04_spatial_infiltration.ipynb` | *Does RT change where CD8/NK sit relative to tumour — infiltration vs exclusion?* Within-tissue distance geometry. | Planned. Where the effector answer lives. |
-| `05_abscopal_geometry.ipynb` | *Does the abscopal effect reproduce in both hemispheres of both `RTCyPSCA_2_*` sections?* | Planned. This is what the split is for. |
+| `03_tumour_state_sc.ipynb` | *Does RT change the tumour cell — antigen presentation, IFN response, death-receptor sensitivity, senescence/SASP?* Tumour pseudobulk (summed raw counts), 27 programs, exact-relabelling nulls, random-program control, within-mouse DiD, ambient-RNA check. | **Written and run locally (2026-10-22), ~30 s.** See below. |
+| `04_spatial_infiltration.ipynb` | *Does RT change where CD8/NK sit relative to tumour — infiltration vs exclusion?* Within-tissue geometry in **true µm**, internally normalised, lymphoid-matched control (vs B cells), label-stringency and leave-one-out checks. | **Written and run locally (2026-10-22), ~20 s.** Reads only obs + coordinates. |
+| `05_abscopal_geometry.ipynb` | *Does `08 §C`'s RT range effect survive true µm, and does any abscopal effect reproduce in both hemispheres of both `RTCyPSCA_2_*` sections?* Streams `X` once to score (cached to `05_cell_scores.npz`), correlograms with `08b`'s controls, hemisphere test against a half-to-half noise null. | **Written and run locally (2026-10-22), ~4 min first run, ~1 min cached.** |
+
+### `03`-`05` (local runs, 2026-10-22) — provisional, one execution each
+
+**Plain version: no RT advantage shows up in tumour-cell state, in effector geometry, or in a
+reproducible abscopal geometry. And the one RT result that had survived (`08`'s longer coupling
+range) does not survive true microns: where its direction reappears, the niche field itself got
+coarser, which `08b`'s control was meant to exclude.**
+
+**`03` — tumour-cell state** (6,614 Cancer_cells, 29 pseudobulks, 27 programs scored):
+- Yardsticks: treated-vs-NoTx median |effect| 0.68 SD, p<0.05 in 35% (MHC-I/II, ISGs, IFN up
+  4-6 SD); the CAR axis 0.72 SD. **RT: 0.24 SD, p<0.05 in 0% between animals, 0% in the
+  within-mouse DiD**, sign agreement below chance (22%).
+- **No RT main-effect lead** (sign-agree + p<0.10 + beats 90% of random programs): 0. cGAS-STING,
+  TRAIL and the curated death-receptor set have too few genes detected in tumour cells to score.
+- Five **interaction** leads — PSCA up, TAG72 down — but the top three (MHC-II both sites,
+  MHC-I machinery at Tu1) are 92-100% **myeloid-dominant genes** (`B2m`, `H2-K1`, `Cd74`...).
+  Ambient-suspect, not proven ambient. The other two (abscopal p53, apoptosis) are at
+  p_inter 0.055/0.09 with 27 programs tested.
+
+**`04` — effector geometry** (true µm: cell spacing 6.6-9.8 µm, so `px × 0.34` is right):
+- **Design limit:** for CD8 the TAG72 irradiated contrast is **not estimable** (1 v 1 usable
+  tissues), so the irradiated site is PSCA-only and the site x RT DiD is PSCA-only.
+- **Face-validity warning:** every lymphoid label — B and Treg most of all — sits in more
+  tumour-rich surroundings than a random non-tumour cell (reference is ~60% neutrophils), also
+  under `c2l_strict`. "CD8 is tumour-proximal" is therefore not cytotoxic infiltration by
+  itself; `prox30_vs_B` is the effector-specific readout.
+- **RT main-effect leads: 0.** The only signal is again an **interaction** at the abscopal site:
+  CD8 tumour proximity PSCA −0.50 vs TAG72 +0.91 log2 (p_inter 0.06), which vanishes against B
+  cells (`prox30_vs_B` PSCA −0.00, TAG72 +0.43). In the figure RT moves the two backgrounds
+  *toward each other* — the same convergence `02b` saw in composition.
+- `core` infiltration needed a 20% (not 50%) tumour threshold: treated sections are 4-6% tumour.
+
+**`05` — the `08` range claim in true µm, and the hemisphere test:**
+- `08`'s bands were ~4.4x too short physically: its "0-25 µm" near field is 0-110 µm and its
+  "100-150 µm" is ~440-660 µm. A true 0-25 µm band is not estimable (too few non-myeloid
+  cells around a macrophage).
+- At 440-660 µm, more far-band coupling with RT in **both** backgrounds shows up in **1 of 4**
+  tier x site cells (damage tier, irradiated: PSCA +0.03, TAG72 +0.08 r, p_main 0.09) with flat
+  amplitude — **but the niche field's own 440-660 µm autocorrelation also rises with RT in both
+  backgrounds** (damage +0.07, metabolic +0.12, p 0.023). That is the field-control failure
+  `08b` existed to rule out.
+- **Abscopal TAG72 coupling is not estimable** (only 1 non-RT abscopal TAG72 section has
+  macrophages; `CyT72_2_4` has 12). Abscopal PSCA: damage-tier coupling is higher with RT at
+  **every** distance (near +0.14, far +0.21) — amplitude, not range — and its niche field moved
+  by the same amount (+0.21).
+- **Hemisphere test:** only one readout has all 4 halves on the RT side and exceeds
+  half-to-half noise: metabolic far-band coupling, with r values of −0.02 to +0.03 in the halves.
+  It is consistent, but too small to support an effect. CD8/NK geometry does not reproduce
+  across halves (1/3, 2/3).
+
+**What this means for the summary claim:** across composition (`01`/`02`/`02b`), tumour state
+(`03`), effector geometry (`04`), and range (`05`), the reproducible structure in this dataset
+is **which CAR was given**, and RT acts mainly as a `CAR x RT` interaction that pulls the two
+backgrounds together, not as a main effect. Nothing here supports an RT advantage at the
+abscopal site.
 
 ### First (local) runs of `01` and `02` — provisional, one execution each
 
@@ -264,4 +319,7 @@ local  /Users/janzules/Roselab/Spatial/CAR_T
   out           results/rt_advantage/  (+ figures/)
 ```
 
-Coordinates: `MICRONS_PER_PIXEL = 0.34` × the per-tissue hires scale, as in `08`.
+Coordinates: **µm = `obsm['spatial']` × 0.34, with no hires scale.** `obsm['spatial']` is in
+full-resolution pixels, and 0.34 µm is one full-resolution pixel. The `× hires_scale` used in
+`spp1Analysis` 02-08 under-states distance 4.2-5x and varies by slide. `04` checks this against
+cell spacing (6.6-9.8 µm nearest-neighbour distance).
