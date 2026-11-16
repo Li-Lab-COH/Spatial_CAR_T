@@ -24,12 +24,12 @@ because the kernel runs on the HPC node and cannot see these local files (same r
 > - **Gene level:** 0 genes at q<0.05 in either background. Cross-background logFC r = −0.288,
 >   **permutation p = 0.49** — inside its own null. Benchmark through the identical pipeline:
 >   treated-vs-NoTx r = **+0.888**, p = 0.004.
-> - **RT is invisible in every compartment** (macs, monocytes, tumour, neutrophils, cDC, all cells),
+> - **RT is invisible in every compartment** (macs, monocytes, tumor, neutrophils, cDC, all cells),
 >   while Cy+CAR-T is reproducible (r = +0.76..+0.89) in every one. So this is **not** an
 >   SPP1-TAM-specific null.
 > - **Within-mouse irradiated-vs-abscopal (Tu1−Tu2)** is null too, and the **non-RT control pair is
 >   more internally consistent (r = +0.62) than the RT pair (r = +0.54)** — that Tu1/Tu2 difference
->   is the tumour *site*, not the beam.
+>   is the tumor *site*, not the beam.
 >
 > **Do not write "RT increases fatty acid processing in SPP1-TAMs."** The SPP1-TAM lipid program is
 > real and strong (01c); what is absent is an effect *of radiation* on it. A first pass showed an
@@ -37,9 +37,9 @@ because the kernel runs on the HPC node and cannot see these local files (same r
 > giveaway was `TNFA_NFKB` (a control pathway) being the largest mover, with opposite signs in the
 > two CAR-T backgrounds.
 >
-> **Where an RT signal could still live:** spatial organisation rather than cell-intrinsic
+> **Where an RT signal could still live:** spatial organization rather than cell-intrinsic
 > expression (notebook 08, drafted but not run), or an earlier timepoint — these are endpoint
-> tumours and an acute RT response would have resolved.
+> tumors and an acute RT response would have resolved.
 
 > **THE ONE SURVIVING RT FINDING (08 §C + 08b) — radiation changes the *range* of the
 > SPP1-TAM↔niche coupling, not its strength, and not the macrophages' metabolism.**
@@ -62,7 +62,7 @@ because the kernel runs on the HPC node and cannot see these local files (same r
 > own metabolic scores. What changed is the **spatial range** of that coupling — it decays to
 > ~37% of its near-field value by 100–150 µm without RT, and persists at ~68–98% with it.*
 >
-> **Systemic, not a local dose effect** — abscopal tumours show it at least as strongly as
+> **Systemic, not a local dose effect** — abscopal tumors show it at least as strongly as
 > irradiated ones (metabolic shape 0.98 vs 0.68). Never word it as a local beam effect.
 >
 > **Limitations to state, not bury:** 1 positive of 4 readouts; n = 2–4 tissues/side and the
@@ -73,7 +73,7 @@ because the kernel runs on the HPC node and cannot see these local files (same r
 > **10 — the axis that actually moves SPP1-TAMs is WHICH CAR, not radiation.**
 >
 > Pseudobulk DESeq2 (summed raw counts) → weighted-KS **GSEA NES** (the `01c` §4d engine, not the
-> rank-sum `z` used in 09), on SPP1-TAMs, site-resolved. 09 had only run RT with tumour site
+> rank-sum `z` used in 09), on SPP1-TAMs, site-resolved. 09 had only run RT with tumor site
 > collapsed into a covariate; tiers A–E here add the irradiated-only, abscopal-only, within-mouse,
 > difference-in-differences and CAR-axis contrasts.
 >
@@ -102,8 +102,8 @@ because the kernel runs on the HPC node and cannot see these local files (same r
 
 > **14 — MARCO is not widely expressed.** `Marco` (on the PDF's SPP1-TAM readout list) is detected in **82 of 93,548
 > cells (0.09%)**; no population exceeds 0.5% (project detection floor: 5-10%). The highest is the `Apoe_high_Mac` /
-> SPP1-TAM state (~0.4%). **Tumour cells: 4 of 6,614 (0.06%)**, indistinguishable from the leakage any equally rare myeloid
-> gene shows in tumour cells. **Suppressive myeloid cells** (M2-like TAMs, classical monocytes, N1/N2 neutrophils) are
+> SPP1-TAM state (~0.4%). **Tumor cells: 4 of 6,614 (0.06%)**, indistinguishable from the leakage any equally rare myeloid
+> gene shows in tumor cells. **Suppressive myeloid cells** (M2-like TAMs, classical monocytes, N1/N2 neutrophils) are
 > 0-0.3%, and cells high on a suppressive program are *not* enriched. Where Marco is detected it follows the Apoe-high /
 > lipid-TREM2 state (~2-7x enriched at matched depth), not Spp1 transcript. The spatial object agrees (0.06% of 2.09M
 > cells, no label measurable). RNA only — MARCO protein would need flow or IHC.
@@ -130,41 +130,41 @@ because the kernel runs on the HPC node and cannot see these local files (same r
 > single-cell DE (Spp1 excluded), transfer it as a graded score. Run `01c`. Do not run 02-04
 > until the definition is settled — all three take the Spp1 call as given.
 
-> **RESOLVED in 01c — the tumour gate, and why the project continues.**
+> **RESOLVED in 01c — the tumor gate, and why the project continues.**
 >
 > On the correct reference (`annotation_v4.h5ad`, 135k cells / full genes), the *ligand-source*
 > question is settled: **Cancer_cell produces ~53% of tissue Spp1**, neutrophils ~23%, the whole
 > macrophage compartment ~8%. So the deck's "SPP1-CD44 interaction-high clusters" are a
-> **tumour-derived Spp1 -> CD44 axis**, and that one claim must be worded that way. This is the
+> **tumor-derived Spp1 -> CD44 axis**, and that one claim must be worded that way. This is the
 > only thing the gate forces.
 >
 > It does **not** touch the project's actual subject — the **metabolic state** of SPP1+
 > macrophages (lipid/lysosomal/TREM2 program), which 01c §4 confirms by single-cell DE
-> independently of the ligand source. A tumour-dominated Spp1 niche *is* the PDF's model: tumour
+> independently of the ligand source. A tumor-dominated Spp1 niche *is* the PDF's model: tumor
 > Spp1/lipid/debris forms the niche; monocyte-derived macrophages become lipid-handling SPP1-TAMs
 > **inside** it. Macrophages are the metabolic **readout**, not the source.
 >
 > The go-forward question (reframed): *among macrophages, does the SPP1-TAM metabolic program
-> track proximity to the tumour Spp1 / oxidised-lipid / hypoxia / adenosine niche?* Threshold-free,
+> track proximity to the tumor Spp1 / oxidised-lipid / hypoxia / adenosine niche?* Threshold-free,
 > graded `SPP1_TAM_sig`, independent of who secretes Spp1. See 01c §3b for the full reframe.
 
 | Notebook | Answers | Gate |
 |---|---|---|
 | `01_spp1_definition_and_abundance.ipynb` | *Which conditions have the most Spp1+ macs?* | §5 **FAILED** — see status. §1-4 valid. |
 | `01b_spp1_source_and_spillover_diagnostic.ipynb` | *Why did §5 fail — depth or spillover? Who makes Spp1?* | Optional now — `01c` supersedes its definition-picking, but §3 (who makes Spp1) is still an open gate. |
-| `01c_singlecell_anchor_and_signature.ipynb` | *Same B-cell control on clean single-cell data; SC-derived signature transferred to spatial* | Done — tumour gate + graded signature. |
-| `01d_cd44_source_and_metabolic_convergence.ipynb` | *Who makes Cd44? Metabolic state of Spp1+ tumour vs Spp1- tumour? Do Spp1+ tumour & SPP1-TAMs converge on one metabolic program?* | Single-cell. Q3 (convergence) is the metabolism-angle centrepiece. |
+| `01c_singlecell_anchor_and_signature.ipynb` | *Same B-cell control on clean single-cell data; SC-derived signature transferred to spatial* | Done — tumor gate + graded signature. |
+| `01d_cd44_source_and_metabolic_convergence.ipynb` | *Who makes Cd44? Metabolic state of Spp1+ tumor vs Spp1- tumor? Do Spp1+ tumor & SPP1-TAMs converge on one metabolic program?* | Single-cell. Q3 (convergence) is the metabolism-angle centerpiece. |
 | `02_pathway_hotspots_and_spp1_enrichment.ipynb` | *Which pathway niches (hypoxia, adenosine, lipid) do they live in?* | Result is a **lead**, not a conclusion, until 03 Part A. |
 | `03_niche_control_and_celltype_neighborhood.ipynb` | *Does 02 survive a circularity control? What cell types surround them?* | Part A decides whether 02 stands. |
-| `04_liana_spp1_cd44.ipynb` | *How does the (tumour-driven) Spp1-CD44 axis vary by condition; do Spp1+ macs localize to it?* | Reframed: axis is tumour-derived (01c). Now asks localization, not macrophage-driving. |
-| `08_rt_effect_spatial_statistics.ipynb` | *Does RT make the SPP1-TAM program more spatially organised / niche-coupled?* | **Run.** §A/§B/§D null (two fail their own contrast-tier control). §C positive → gated on `08b`. |
+| `04_liana_spp1_cd44.ipynb` | *How does the (tumor-driven) Spp1-CD44 axis vary by condition; do Spp1+ macs localize to it?* | Reframed: axis is tumor-derived (01c). Now asks localization, not macrophage-driving. |
+| `08_rt_effect_spatial_statistics.ipynb` | *Does RT make the SPP1-TAM program more spatially organized / niche-coupled?* | **Run.** §A/§B/§D null (two fail their own contrast-tier control). §C positive → gated on `08b`. |
 | `08b_rt_range_controls.ipynb` | *Does §C survive the four controls it never ran?* | **Yes, 3 of 4.** The one surviving RT finding in the project. |
 | `09_rt_effect_on_spp1tam_state_sc.ipynb` | *Does RT shift SPP1-TAMs toward fatty-acid processing? (single-cell)* | **Done — clean, powered NULL.** See the RESOLVED block at the top. |
-| `10_spp1tam_behaviour_by_condition_sc.ipynb` | *What are SPP1-TAMs doing in each condition? Pseudobulk DE → GSEA NES, site-resolved* | **Done.** The standout is the **CAR axis**, not RT. |
+| `10_spp1tam_behavior_by_condition_sc.ipynb` | *What are SPP1-TAMs doing in each condition? Pseudobulk DE → GSEA NES, site-resolved* | **Done.** The standout is the **CAR axis**, not RT. |
 | `11_myeloid_abundance_by_condition_sc.ipynb` | *Is the 51% CLR-variance `M1_like_Mac` CAR effect an expansion or a loss; does one mouse carry it; is it in both RT strata?* | **Done.** One point per sample, mice paired Tu1→Tu2. |
 | `12_myeloid_trajectory_scfates.ipynb` | *Is there a monocyte → macrophage → SPP1/TREM2-TAM ordering, where does it branch, what changes along it?* (scFates) | **Drafted, not yet run.** Runs **locally** on the `traj_r_py311` kernel, not on the HPC. §6's four controls gate everything downstream. |
 | `13_spp1tam_fate_cellrank.ipynb` | *Terminal states, per-cell P(SPP1-TAM), driver genes, and whether treatment moves the probability* (CellRank) | **Drafted, not yet run.** Local, same kernel; consumes 12's h5ad. No velocity kernel is possible here — see the header. |
-| `SpecificGenes/marco_expression_sc.ipynb` (moved out of this folder) | *Is MARCO expressed in tumour cells, SPP1-expressing macrophages or suppressive myeloid cells — and widely at all?* Detection for every population, tumour-leakage control, 7 SPP1 definitions, suppressive program, spatial check | **Done.** No — see the block at the top. Local, `spatial_cpu_py311`. |
+| `SpecificGenes/marco_expression_sc.ipynb` (moved out of this folder) | *Is MARCO expressed in tumor cells, SPP1-expressing macrophages or suppressive myeloid cells — and widely at all?* Detection for every population, tumor-leakage control, 7 SPP1 definitions, suppressive program, spatial check | **Done.** No — see the block at the top. Local, `spatial_cpu_py311`. |
 
 Each ends with a printed `SUMMARY — report these back` block meant to be pasted back for the
 next iteration. `spp1Analysis.ipynb` is left empty as scratch space.
@@ -228,8 +228,8 @@ cores, and handing GAM fits to the efficiency cores makes the step slower, not f
   `Mapping_script.py` used to produce the spatial labels, so `M1_like_Mac`/`M2_like_Mac`/
   `Intermediate_Mac`/`B` exist on both sides and **`Cancer_cell` is present**.
   **Do not use** `data/sc-reference/sc_reference_cell2location.h5ad` — coarse `cell_type`
-  (Macrophage/Monocyte/…), labels don't match spatial, and it has **no tumour compartment**, so
-  the "does the tumour make Spp1?" gate is unanswerable with it.
+  (Macrophage/Monocyte/…), labels don't match spatial, and it has **no tumor compartment**, so
+  the "does the tumor make Spp1?" gate is unanswerable with it.
 - **Design**: `tissue` = `COND_loc_rep`. Conditions `NoTx, CyPSCA, CyT72, RTCyPSCA, RTCyT72`;
   in RT groups **loc 1 = irradiated, loc 2 = abscopal**. n = 2–4 tissues per group, so every
   contrast is read as effect size + replicate consistency, never as a p-value.
@@ -277,7 +277,7 @@ Each has a control built in, because all three would produce a *positive-looking
    control. **This control fired.** The raw-count definition is dead; `01b` diagnoses whether
    the cause is depth (fix: CP10K normalization) or spatial spillover (fix: subtract local
    background) and picks a replacement. This is the control doing its job — had we skipped it,
-   80.7% of macrophages would have been labelled "Spp1+ TAMs" and every downstream result
+   80.7% of macrophages would have been labeled "Spp1+ TAMs" and every downstream result
    would have been a restatement of "macrophage".
 2. **Macrophage-ness vs the Spp1 state.** "Spp1+ macs are in hypoxic zones" is trivially true if
    all macrophages are. → Every enrichment uses **Spp1- macrophages as the baseline**, not all
